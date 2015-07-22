@@ -66,15 +66,17 @@ function make_fade_strip_to_random_colors_animaion(speed)
 end
 
 function set_strip(state)
-    local s=''
+    local s={}
     strip.cur=state
     for i=strip.len,1,-1 do
         strip.cur.red[i]=clamp(0,trunc(strip.cur.red[i]),255)
         strip.cur.green[i]=clamp(0,trunc(strip.cur.green[i]),255)
         strip.cur.blue[i]=clamp(0,trunc(strip.cur.blue[i]),255)
-        s=string.char(strip.cur.blue[i],strip.cur.green[i],strip.cur.red[i])..s
-    end
-    ws2812.write(strip.pin,s)
+        s[#s+1]=tostring(strip.cur.blue[i])
+	s[#s+1]=tostring(strip.cur.red[i])
+	s[#s+1]=tostring(strip.cur.green[i])
+    end    
+    ws2812.write(strip.pin,table.concat(s,''))
 end
 
 strip=init_strip(led_pin,63)
