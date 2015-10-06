@@ -3,6 +3,7 @@
 #include <DHT.h>
 
 #include <NeoPixelBus.h>
+#include <NeoPixelAnimator.h>
 #include <RgbColor.h>
 
 #include <MQTT.h>
@@ -12,14 +13,19 @@
 
 //const char* ssid     = "Freifunk";
 //const char* password = "";
+//const char* ssid     = "ThatsNoWiFi";
+//const char* password = "J2UYpGaNUN2gh7nb";
 const char* ssid     = "1084059";
 const char* password = "2415872658287010";
 String client_id;
 const char* mqtt_password = "foo";
-IPAddress server(10,1,0,15);
+IPAddress server(10,1,0,3);
+//IPAddress server(10,5,19,125);
+//IPAddress server(10,7,14,187);
 WiFiClient wclient;
 PubSubClient client(wclient, server);
-NeoPixelBus leds = NeoPixelBus(pixelCount, 0);
+NeoPixelBus leds(pixelCount, 0);
+NeoPixelAnimator animator(&leds);
 uint16_t effectState = 0;
 
 //DHT dht(2,DHT22,0);
@@ -43,13 +49,24 @@ public:
       prev_millis=curr_millis;
       float temp=dht.readTemperature();
       float humi=dht.readHumidity();
-      Serial.print(temp);
-      Serial.print(" Humidity: ");
-      Serial.println(humi);
       
-      String s="{sensor:\"node-10011266\", temperature:"+String(temp)+" , humidity: "+String(humi)+"}";
-      if(client.connected())
-        client.publish("Wohnung/Wohnzimmer",s);
+      if(!isnan(temp) && !isnan(humi))
+      {
+        Serial.print("Temperature: ");
+        Serial.print(temp);
+        Serial.print(" Humidity: ");
+        Serial.print(humi);
+        String s="{\"sensor\":\"node-10011266\", \"temperature\":"+String(temp)+" , \"humidity\": "+String(humi)+"}";
+        if(client.connected())
+          client.publish("Wohnung/Wohnzimmer",s);
+        else
+          Serial.print(" - Not connected to MQTT");
+        Serial.println();
+      }
+      else
+      {
+        Serial.println("Read invalid data from sensor - Discarding");
+      }
     }
   }
 };
@@ -73,28 +90,6 @@ void SetRandomSeed()
   
   // Serial.println(seed);
   randomSeed(seed);
-}
-
-void FadeInFadeOutRinseRepeat(uint8_t peak)
-{
-  if (effectState == 0)
-  {
-    for (uint8_t pixel = 0; pixel < pixelCount; pixel++)
-    {
-      uint16_t time = random(800,1000);
-      leds.LinearFadePixelColor(time, pixel, RgbColor(random(peak), random(peak), random(peak)));
-    }
-  }
-  else if (effectState == 1)
-  {
-    for (uint8_t pixel = 0; pixel < pixelCount; pixel++)
-    {
-      uint16_t time = random(600,700);
-      leds.LinearFadePixelColor(time, pixel, RgbColor(0, 0, 0));
-    }
-  }
-  effectState = (effectState + 1) % 2; // next effectState and keep within the number of effectStates
-  
 }
 
 void mqtt_cb(const MQTT::Publish &pub)
@@ -140,7 +135,7 @@ void mqtt_cb(const MQTT::Publish &pub)
             *(payload+1),
             *(payload+2)
           );
-          leds.FadeTo(10*speed,color);
+          animator.FadeTo(10*speed,color);
         }
       }
       else if(cmd='C')
@@ -150,6 +145,38 @@ void mqtt_cb(const MQTT::Publish &pub)
       }
     }
   }
+}
+
+void ensure_connected_to_wifi()
+{
+  if(WiFi.status() != WL_CONNECTED)
+  {
+    client.disconnect(); // disconnect mqtt so it reconnects when required.
+    WiFi.begin(ssid, password);  
+    while (WiFi.status() != WL_CONNECTED)
+    {
+      delay(500);
+      Serial.print(".");
+    }
+    WiFi.printDiag(Serial);    
+  }
+}
+
+void ensure_connected_to_mqtt()
+{
+  if(!client.connected())
+  {
+    Serial.println("Connecting to MQTT");
+    if(client.connect(MQTT::Connect(client_id).set_auth(client_id,mqtt_password)))
+    {
+      Serial.println("Connected to MQTT");
+      client.set_callback(mqtt_cb);
+      client.subscribe(MQTT::Subscribe()
+        .add_topic("Control/Global")
+        .add_topic("Control/LED")
+      );
+    }
+  }  
 }
 
 void setup() {
@@ -169,46 +196,26 @@ void setup() {
   leds.Begin();
   //leds.ClearTo(0,0,0);
   leds.Show();
-  
-  WiFi.begin(ssid, password);
-  
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
-  }
 
+  ensure_connected_to_wifi();
   Serial.println("");
   Serial.println("WiFi connected");  
   Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
 
-  Serial.println("Connecting to MQTT");
-  if(client.connect(MQTT::Connect(client_id).set_auth(client_id,mqtt_password)))
-  {
-    Serial.println("Connected to MQTT");
-    client.set_callback(mqtt_cb);
-    client.subscribe(MQTT::Subscribe()
-      .add_topic("Control/Global")
-      .add_topic("Control/LED")
-    );
-  }
+  ensure_connected_to_mqtt();
 }
 
 void loop() {
+  ensure_connected_to_wifi();
+  ensure_connected_to_mqtt();
+  
   client.loop();
   reader.update();
-  
-  //FadeInFadeOutRinseRepeat(192);
-  //PickRandom(128);
-  
-  // start animating
-  leds.StartAnimating();
-  
-  // wait until no more animations are running
-  while (leds.IsAnimating())
+    
+  while (animator.IsAnimating())
   {
-    leds.UpdateAnimations();
+    animator.UpdateAnimations();
     leds.Show();
     delay(31); // ~30hz change cycle
   }
