@@ -1,0 +1,2 @@
+NeoPixelBus dma branch
+RotaryEncoder http://www.mathertel.de/Arduino/RotaryEncoderLibrary.aspx

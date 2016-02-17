@@ -1,0 +1,324 @@
+#include <ArduinoOTA.h>
+#include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
+#include <WiFiUdp.h>
+#include <RotaryEncoder.h>
+#include <NeoPixelBus.h>
+#include <NeoPixelAnimator.h>
+#include <RgbColor.h>
+#include <HslColor.h>
+#include "data.h"
+
+#define led_count 15
+//#define led_pin 13 // D4
+#define button_pin 0 // D3
+#define rotary_pin_left  5 // D1
+#define rotary_pin_right 4 // D2
+#define wifi_pin 12 // Pullup: 1=Normal, 0=Freifunk
+
+NeoPixelBus leds(led_count, 0); // pin number not required with dma
+NeoPixelAnimator animator(&leds, NEO_CENTISECONDS);
+
+String client_id;
+int last_button_state;
+int button_down;
+int last_encoder_position;
+int current_color_index=0;
+int leds_on=0;
+int brightness_offset=0;
+unsigned long hold_start=0;
+unsigned long short_press=120;
+unsigned long medium_press=600;
+float h=0,c=0,l=0;
+
+RotaryEncoder encoder(rotary_pin_left,rotary_pin_right);
+WiFiClient wclient;
+
+#define ArrayCount(arr) (sizeof(arr)/sizeof(0[arr]))
+
+RgbColor colors[]={
+  {255, 147, 41}, //Candle (1900K)
+  {255, 197, 143}, //40W Tungsten (2600K)
+  {255, 214, 170}, //100W Tungsten (2850K)
+  {255, 241, 224}, //Halogen (3200K)
+  {255, 250, 244}, //Carbon Arc (5200K)
+  {255, 255, 251}, //High Noon Sun (5400K)
+  {255, 255, 255}, //Direct Sunlight (6000K)
+  {201, 226, 255}, //Overcast Sky (7000K)
+  {64, 156, 255}, //Clear Blue Sky (20000K)
+  {255,0,0},
+  {0,255,0},
+  {0,0,255},
+  {127,127,127},
+  {255,255,255},
+};
+
+enum rotary_mode
+{
+  brightness,
+  color,
+};
+
+enum rotary_mode current_mode=brightness;
+const char* ssid_ff     = "Freifunk";
+const char* password_ff = "";
+const char* ssid_home     = "1084059";
+const char* password_home = "2415872658287010";
+
+void ensure_connected_to_wifi()
+{
+  if(WiFi.status() != WL_CONNECTED)
+  {
+    const char* ssid;
+    const char* password;
+    
+    if(digitalRead(wifi_pin)==1)
+    {
+      ssid=ssid_home;
+      password=password_home;
+    }
+    else
+    {
+      ssid=ssid_ff;
+      password=password_ff;
+    }
+    WiFi.begin(ssid, password);
+    Serial.print("Connecting to WiFi ");
+    Serial.print(ssid);
+    while (WiFi.status() != WL_CONNECTED)
+    {
+      delay(500);
+      Serial.print(".");
+    }
+    Serial.println();
+    //WiFi.printDiag(Serial);
+    Serial.print("Connected to WiFi. ");
+    Serial.println(WiFi.localIP());
+    ArduinoOTA.begin();
+  }
+}
+
+void encoder_isr()
+{    
+  encoder.tick();
+}
+
+void start_animation_hscroll(float s, float l)
+{
+  for (uint16_t pixel_index=0;pixel_index<led_count;pixel_index++)
+  {
+    float h=pixel_index/(float)led_count;
+    float h_new=h+1;
+    HslColor color_start(h,s,l);
+    HslColor color_stop(h_new,s,l);
+    bool wrapped=false;
+    AnimUpdateCallback cb_update=[=](float progress) mutable
+    {
+      // progress will start at 0.0 and end at 1.0
+      float h_new=color_start.H+progress;
+      if(h_new>1.0 || wrapped)
+      {
+        wrapped=true;
+        h_new-=1.0;
+      }
+      HslColor color_new(h_new, color_start.S, color_start.L);
+      leds.SetPixelColor(pixel_index, color_new);
+
+      if(pixel_index==2)
+      {
+        Serial.print(progress);
+        Serial.print(" ");
+        Serial.println(h_new);
+      }
+    };
+    animator.StartAnimation(pixel_index,500/*centiseconds*/,cb_update);
+  }
+}
+
+void setup_ota_update()
+{
+  ArduinoOTA.onStart([]() {
+  Serial.println("[OTA] Start");
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("\n[OTA] End");
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("[OTA] Progress: %u%%\r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("[OTA] Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+    else if (error == OTA_END_ERROR) Serial.println("End Failed");
+  });  
+}
+
+void setup() {
+  client_id="node-"+String(ESP.getChipId());
+  
+  Serial.begin(115200);
+  Serial.pins(15,13);  
+  delay(10);
+  Serial.println();
+
+  Serial.print("Client-Id: ");
+  Serial.println(client_id);
+  
+  pinMode(button_pin, INPUT_PULLUP);
+  last_button_state=digitalRead(button_pin);
+
+  pinMode(wifi_pin, INPUT_PULLUP);
+
+  pinMode(rotary_pin_left, INPUT_PULLUP);
+  pinMode(rotary_pin_right, INPUT_PULLUP);
+
+  current_color_index=0;
+  leds.Begin();
+  leds.ClearTo(0,0,0);
+  leds.Show();
+  //animator.FadeTo(1000,RgbColor(63,63,0));
+  
+
+  attachInterrupt(digitalPinToInterrupt(rotary_pin_left),encoder_isr,CHANGE);
+  attachInterrupt(digitalPinToInterrupt(rotary_pin_right),encoder_isr,CHANGE);
+  setup_ota_update();
+}
+
+void loop() {
+  ensure_connected_to_wifi();
+  ArduinoOTA.handle();
+  
+  int button=digitalRead(button_pin);
+  int encoder_position=encoder.getPosition();
+  int encoder_delta=last_encoder_position-encoder_position;
+  last_encoder_position=encoder_position;
+ 
+  if(encoder_delta!=0)
+  {
+    Serial.print("Encoder delta: ");
+    Serial.println(encoder_delta);
+    /*
+    if(current_mode==color)
+    {
+      current_color_index+=encoder_delta;
+      if(current_color_index<0)
+        current_color_index=ArrayCount(colors)-1;
+      else
+        current_color_index%=ArrayCount(colors);
+      
+      Serial.print("Mode: Color - ");
+      Serial.println(current_color_index);      
+      brightness_offset=0;  
+      RgbColor col=colors[current_color_index];
+      animator.FadeTo(500,col);
+    }
+    else if(current_mode==brightness)
+    {
+      brightness_offset+=(4*encoder_delta);
+      Serial.print("Mode: Brightness - ");
+      Serial.println(brightness_offset);
+      RgbColor c=colors[current_color_index];
+      if(brightness_offset<0)
+        c.Darken(-brightness_offset);
+      else if(brightness_offset>0)
+        c.Lighten(brightness_offset);
+      leds.ClearTo(c);
+      leds.Show();
+    }*/
+  }
+
+
+  if(button!=last_button_state)
+  {
+    /*Serial.print("Button ");
+    Serial.print(last_button_state);
+    Serial.print(" -> ");
+    Serial.println(button);*/
+    
+    if(last_button_state==1 && button==0) // Button just became pressed
+    {
+      hold_start=millis();
+      button_down=1;
+    }
+    else if(last_button_state==0 && button==1) // Button released
+    {
+      unsigned long hold_time=millis()-hold_start;
+      button_down=0;
+      if(hold_time<short_press)
+      {
+        start_animation_hscroll(0.7, 0.25);
+        /*
+        if(current_mode==brightness)
+        {
+          current_mode=color;
+        }
+        else if(current_mode==color)
+        {
+          current_mode=brightness;
+        }*/
+      }
+    }
+    last_button_state=button;
+  }
+      /*unsigned long hold_time=millis()-hold_start;
+      button_down=0;
+      Serial.print("Hold time: ");
+      Serial.print(hold_time);
+      Serial.println("ms");
+      if(hold_time<short_press)
+      {
+        Serial.println("Short press detected");
+        RgbColor col=colors[current_color_index];
+        if(leds_on==1)
+        {
+          current_color_index++;
+          current_color_index%=ArrayCount(colors);        
+        }
+        else
+        {
+          leds_on=1;
+        }
+        animator.FadeTo(500,col);*/
+      //}
+      /*else if(hold_time>short_press && hold_time<medium_press)
+      {
+        Serial.println("Medium press detected");
+        animator.FadeTo(500,RgbColor(0,0,0));
+        leds_on=0;
+      }
+      else // long hold
+      {
+        Serial.println("Long hold detected");
+        // Do nothing here
+      }*/
+    //}
+    //last_button_state=button;
+//  }
+
+/*
+  if(button_down==1)
+  {
+    unsigned long press_time=millis()-hold_start;
+    if(press_time>medium_press) // long hold
+    {
+      unsigned long hold_time=press_time-medium_press;
+      unsigned char darken=(hold_time/2000.0*255.0);
+      RgbColor c=colors[current_color_index];
+      c.Darken(darken);
+      leds.ClearTo(c);
+      leds.Show();
+    }
+  }
+  */
+  
+  while(animator.IsAnimating())
+  {
+    animator.UpdateAnimations();
+    leds.Show();
+    //delay(31); // ~30hz change cycle
+    delay(16); // ~60hz change cycle
+  }
+}
