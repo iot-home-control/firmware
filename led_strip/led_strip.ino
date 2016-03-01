@@ -21,16 +21,19 @@ NeoPixelBus leds(led_count, 0); // pin number not required with dma
 NeoPixelAnimator animator(&leds, NEO_CENTISECONDS);
 
 String client_id;
+
 int last_button_state;
 int button_down;
+
 int last_encoder_position;
+
 int current_color_index=0;
-int leds_on=0;
-int brightness_offset=0;
-unsigned long hold_start=0;
-unsigned long short_press=120;
-unsigned long medium_press=600;
-float h=0,c=0,l=0;
+
+unsigned int hold_start=0;
+const unsigned int short_press=120;
+const unsigned int medium_press=300;
+
+float current_h=0,current_s=0.2,current_l=0.1;
 
 RotaryEncoder encoder(rotary_pin_left,rotary_pin_right);
 WiFiClient wclient;
@@ -56,11 +59,12 @@ RgbColor colors[]={
 
 enum rotary_mode
 {
-  brightness,
-  color,
+  mode_h,
+  mode_s,
+  mode_l,
 };
 
-enum rotary_mode current_mode=brightness;
+enum rotary_mode current_mode=mode_h;
 const char* ssid_ff     = "Freifunk";
 const char* password_ff = "";
 const char* ssid_home     = "1084059";
@@ -125,14 +129,30 @@ void encoder_isr()
   encoder.tick();
 }
 
+AnimUpdateCallback wrap_anim_callback(const AnimUpdateCallback& normal_update, const std::function<void()>& final_update)
+{
+  AnimUpdateCallback res=[=](float progress)
+  {
+    
+    if(progress!=1.0)
+    {
+      normal_update(progress);
+    }
+    else
+    {
+      final_update();
+    }
+  };
+  return res;
+}
+
 void start_animation_hscroll(float s, float l)
 {
   for (uint16_t pixel_index=0;pixel_index<led_count;pixel_index++)
   {
-    float h=pixel_index/(float)led_count;
+    float h=pixel_index/(float)(led_count+1);
     float h_new=h+1;
     HslColor color_start(h,s,l);
-    HslColor color_stop(h_new,s,l);
     bool wrapped=false;
     AnimUpdateCallback cb_update=[=](float progress) mutable
     {
@@ -145,15 +165,42 @@ void start_animation_hscroll(float s, float l)
       }
       HslColor color_new(h_new, color_start.S, color_start.L);
       leds.SetPixelColor(pixel_index, color_new);
-
-      if(pixel_index==2)
-      {
-        Serial.print(progress);
-        Serial.print(" ");
-        Serial.println(h_new);
-      }
     };
-    animator.StartAnimation(pixel_index,500/*centiseconds*/,cb_update);
+    animator.StartAnimation(pixel_index,40/*centiseconds*/,wrap_anim_callback(cb_update,[=]()
+    {
+      leds.SetPixelColor(pixel_index, HslColor(current_h,current_s,current_l));
+    }));
+  }
+}
+
+void start_animation_lbounce()
+{
+  for (uint16_t pixel_index=0;pixel_index<led_count;pixel_index++)
+  {
+    //int factor=(pixel_index%2)?1:-1;
+    HslColor color_start(leds.GetPixelColor(pixel_index));
+    int factor=(color_start.L>0.5)?-1:1;
+    float l_new=color_start.L+factor*0.1;
+    HslColor color_stop(color_start.H, color_start.S, l_new);
+    AnimUpdateCallback cb_update=[=](float progress) mutable
+    {
+      // progress will start at 0.0 and end at 1.0
+      HslColor color_new;
+      if(progress<0.5)
+      {
+        color_new=HslColor::LinearBlend(color_start, color_stop, 2*progress);
+      }
+      else
+      {
+        color_new=HslColor::LinearBlend(color_stop, color_start, 2*(progress-0.5));
+      }
+      
+      leds.SetPixelColor(pixel_index, color_new);
+    };
+    animator.StartAnimation(pixel_index,25/*centiseconds*/,wrap_anim_callback(cb_update,[=]()
+    {
+      leds.SetPixelColor(pixel_index, HslColor(current_h,current_s,current_l));
+    }));
   }
 }
 
@@ -175,7 +222,32 @@ void setup_ota_update()
     else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
     else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
     else if (error == OTA_END_ERROR) Serial.println("End Failed");
-  });  
+  });
+  ArduinoOTA.setPassword("123@Test");
+}
+
+void hsl_wrap(float& v)
+{
+  if(v>1)
+  {
+    v-=1;
+  }
+  else if(v<0)
+  {
+    v+=1;
+  }
+}
+
+void hsl_clamp(float& v)
+{
+  if(v<0)
+  {
+    v=0;
+  }
+  else if(v>1)
+  {
+    v=1;
+  }
 }
 
 void setup() {
@@ -200,11 +272,10 @@ void setup() {
 
   current_color_index=0;
   leds.Begin();
-  leds.ClearTo(0,0,0);
+  //leds.ClearTo(0,0,0);
+  leds.ClearTo(HslColor(current_h,current_s,current_l));
   leds.Show();
-  //animator.FadeTo(1000,RgbColor(63,63,0));
   
-
   attachInterrupt(digitalPinToInterrupt(rotary_pin_left),encoder_isr,CHANGE);
   attachInterrupt(digitalPinToInterrupt(rotary_pin_right),encoder_isr,CHANGE);
   setup_ota_update();
@@ -221,36 +292,32 @@ void loop() {
  
   if(encoder_delta!=0)
   {
-    Serial.print("Encoder delta: ");
-    Serial.println(encoder_delta);
-    /*
-    if(current_mode==color)
+    //Serial.print("Encoder delta: ");
+    //Serial.println(encoder_delta);
+
+    if(current_mode==mode_h)
     {
-      current_color_index+=encoder_delta;
-      if(current_color_index<0)
-        current_color_index=ArrayCount(colors)-1;
-      else
-        current_color_index%=ArrayCount(colors);
-      
-      Serial.print("Mode: Color - ");
-      Serial.println(current_color_index);      
-      brightness_offset=0;  
-      RgbColor col=colors[current_color_index];
-      animator.FadeTo(500,col);
+      current_h+=encoder_delta*0.01;
+      hsl_wrap(current_h);
+      Serial.print("h: ");
+      Serial.println(current_h);
     }
-    else if(current_mode==brightness)
+    else if(current_mode==mode_s)
     {
-      brightness_offset+=(4*encoder_delta);
-      Serial.print("Mode: Brightness - ");
-      Serial.println(brightness_offset);
-      RgbColor c=colors[current_color_index];
-      if(brightness_offset<0)
-        c.Darken(-brightness_offset);
-      else if(brightness_offset>0)
-        c.Lighten(brightness_offset);
-      leds.ClearTo(c);
-      leds.Show();
-    }*/
+      current_s+=encoder_delta*0.01;
+      hsl_clamp(current_s);
+      Serial.print("s: ");
+      Serial.println(current_s);
+    }
+    else if(current_mode==mode_l)
+    {
+      current_l+=encoder_delta*0.01;
+      hsl_clamp(current_l);
+      Serial.print("l: ");
+      Serial.println(current_l);
+    }
+    leds.ClearTo(HslColor(current_h,current_s,current_l));
+    leds.Show();
   }
 
 
@@ -270,72 +337,34 @@ void loop() {
     {
       unsigned long hold_time=millis()-hold_start;
       button_down=0;
-      if(hold_time<short_press)
+      if(hold_time>=short_press && hold_time<=medium_press)
       {
-        start_animation_hscroll(0.7, 0.25);
-        /*
-        if(current_mode==brightness)
+        if(current_mode==mode_h)
         {
-          current_mode=color;
+          current_mode=mode_s;
+          Serial.println("Mode: s");
         }
-        else if(current_mode==color)
+        else if(current_mode==mode_s)
         {
-          current_mode=brightness;
-        }*/
+          current_mode=mode_l;
+          start_animation_lbounce();
+          Serial.println("Mode: l");
+        }
+        else if(current_mode==mode_l)
+        {
+          current_mode=mode_h;
+          start_animation_hscroll(0.7,current_l);
+          Serial.println("Mode: h");
+        }
+      }
+      else if(hold_time>=medium_press)
+      {
+        leds.ClearTo(0,0,0);
+        leds.Show();
       }
     }
     last_button_state=button;
   }
-      /*unsigned long hold_time=millis()-hold_start;
-      button_down=0;
-      Serial.print("Hold time: ");
-      Serial.print(hold_time);
-      Serial.println("ms");
-      if(hold_time<short_press)
-      {
-        Serial.println("Short press detected");
-        RgbColor col=colors[current_color_index];
-        if(leds_on==1)
-        {
-          current_color_index++;
-          current_color_index%=ArrayCount(colors);        
-        }
-        else
-        {
-          leds_on=1;
-        }
-        animator.FadeTo(500,col);*/
-      //}
-      /*else if(hold_time>short_press && hold_time<medium_press)
-      {
-        Serial.println("Medium press detected");
-        animator.FadeTo(500,RgbColor(0,0,0));
-        leds_on=0;
-      }
-      else // long hold
-      {
-        Serial.println("Long hold detected");
-        // Do nothing here
-      }*/
-    //}
-    //last_button_state=button;
-//  }
-
-/*
-  if(button_down==1)
-  {
-    unsigned long press_time=millis()-hold_start;
-    if(press_time>medium_press) // long hold
-    {
-      unsigned long hold_time=press_time-medium_press;
-      unsigned char darken=(hold_time/2000.0*255.0);
-      RgbColor c=colors[current_color_index];
-      c.Darken(darken);
-      leds.ClearTo(c);
-      leds.Show();
-    }
-  }
-  */
   
   while(animator.IsAnimating())
   {
