@@ -14,7 +14,8 @@
 #define button_pin 0 // D3
 #define rotary_pin_left  5 // D1
 #define rotary_pin_right 4 // D2
-#define wifi_pin 12 // Pullup: 1=Normal, 0=Freifunk
+#define wifi_bit0 12 // Pullup
+#define wifi_bit1 14 // Pullup: 11=Home, 10=Frefunk, 01=Rikus, 00=Reserved
 
 NeoPixelBus leds(led_count, 0); // pin number not required with dma
 NeoPixelAnimator animator(&leds, NEO_CENTISECONDS);
@@ -64,6 +65,8 @@ const char* ssid_ff     = "Freifunk";
 const char* password_ff = "";
 const char* ssid_home     = "1084059";
 const char* password_home = "2415872658287010";
+const char* ssid_rikus     = "ThatsNoWiFi";
+const char* password_rikus = "J2UYpGaNUN2gh7nb";
 
 void ensure_connected_to_wifi()
 {
@@ -71,16 +74,36 @@ void ensure_connected_to_wifi()
   {
     const char* ssid;
     const char* password;
+
+    byte bit0=digitalRead(wifi_bit0);
+    byte bit1=digitalRead(wifi_bit1);
+    int wifi_index=(bit1<<1)+bit0;
+    Serial.print("bit0: ");
+    Serial.print(bit0);
+    Serial.print(" bit1: ");
+    Serial.print(bit1);
+    Serial.print(" ");
+    Serial.println(wifi_index);
     
-    if(digitalRead(wifi_pin)==1)
+    if(wifi_index==3)
     {
       ssid=ssid_home;
       password=password_home;
     }
-    else
+    else if(wifi_index==2)
     {
       ssid=ssid_ff;
       password=password_ff;
+    }
+    else if(wifi_index==1)
+    {
+      ssid=ssid_rikus;
+      password=password_rikus;
+    }
+    else
+    {
+      ssid=0;
+      password=0;
     }
     WiFi.begin(ssid, password);
     Serial.print("Connecting to WiFi ");
@@ -91,7 +114,6 @@ void ensure_connected_to_wifi()
       Serial.print(".");
     }
     Serial.println();
-    //WiFi.printDiag(Serial);
     Serial.print("Connected to WiFi. ");
     Serial.println(WiFi.localIP());
     ArduinoOTA.begin();
@@ -170,7 +192,8 @@ void setup() {
   pinMode(button_pin, INPUT_PULLUP);
   last_button_state=digitalRead(button_pin);
 
-  pinMode(wifi_pin, INPUT_PULLUP);
+  pinMode(wifi_bit0, INPUT_PULLUP);
+  pinMode(wifi_bit1, INPUT_PULLUP);
 
   pinMode(rotary_pin_left, INPUT_PULLUP);
   pinMode(rotary_pin_right, INPUT_PULLUP);
