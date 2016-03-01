@@ -208,14 +208,35 @@ void setup_ota_update()
 {
   ArduinoOTA.onStart([]() {
   Serial.println("[OTA] Start");
+  leds.ClearTo(0,0,0);
+  leds.SetPixelColor(0,32,32,0);
+  leds.Show();
   });
   ArduinoOTA.onEnd([]() {
     Serial.println("\n[OTA] End");
+	leds.ClearTo(0,0,0);
+	leds.SetPixelColor(0,0,32,0);
+	leds.Show();	
   });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
     Serial.printf("[OTA] Progress: %u%%\r", (progress / (total / 100)));
+	float p=(float)progress/(float)total;
+	float led_p=1/(float)led_count;
+	for(int led_index=0;led_index<led_count;led_index++)
+	{
+		if(p>=led_index*led_p)
+			leds.SetPixelColor(led_index,32,32,32);
+		else
+			leds.SetPixelColor(led_index,0,0,0);
+	}
+	leds.Show();
+	
   });
   ArduinoOTA.onError([](ota_error_t error) {
+	leds.ClearTo(0,0,0);
+	leds.SetPixelColor(0,32,0,0);
+	leds.Show();	
+  
     Serial.printf("[OTA] Error[%u]: ", error);
     if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
     else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
