@@ -31,9 +31,9 @@ def data_recent_img():
     x_humi = []
     y_temp = []
     y_humi = []
-    dt=datetime.datetime.nowdate-datetime.time.timedelta(hours=1)
-    dps_temp = db.session.query(DataPoint).filter(data_type=1, timestamp>=dt)
-    dps_humi = db.session.query(DataPoint).filter(data_type=2, timestamp>=dt)
+    dt=datetime.datetime.now()-datetime.timedelta(hours=1)
+    dps_temp = db.session.query(DataPoint).filter(DataPoint.data_type==1).filter(DataPoint.timestamp>=dt)
+    dps_humi = db.session.query(DataPoint).filter(DataPoint.data_type==2).filter(DataPoint.timestamp>=dt)
 
     for p in dps_temp:
         x_temp.append(p.timestamp)
