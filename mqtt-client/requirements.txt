@@ -1,3 +1,0 @@
-SQLAlchemy
-paho-mqtt
-alembic

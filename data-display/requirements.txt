@@ -1,6 +1,0 @@
-Flask
-Flask-SQLAlchemy
-watchdog
-blinker
-passlib
-matplotlib
