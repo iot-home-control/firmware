@@ -1,0 +1,12 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#define HAS_CONFIG_H
+
+#define WIFI_SSID "MyWiFiSSID"
+#define WIFI_PASS "ASecurePassword"
+
+#define OTA_PASS "SomePassword"
+#define PROVISION_SERVER "10.0.0.1"
+
+#endif // CONFIG_H
