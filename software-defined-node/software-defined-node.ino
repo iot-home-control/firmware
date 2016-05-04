@@ -5,6 +5,7 @@
 #include "config.h"
 #include "wifi_connector.h"
 #include "updater_ota.h"
+#include "updater_http.h"
 #include "mqtt_handler.h"
 
 #include "sensor_dht22.h"
@@ -17,6 +18,7 @@
 String client_id;
 wifi_connector wifi_con;
 updater_ota update_ota;
+updater_http update_http;
 mqtt_handler mqtt;
 sensor_dht22 dht22;
 gpio_pin pin0;
@@ -48,11 +50,30 @@ void setup() {
     {
         Serial.println("Connected to WiFi");
         update_ota.begin();
+        update_http.check();
     };
     
     update_ota.set_password(OTA_PASS);
     update_ota.set_hostname("snd");
     
+    update_http.begin("http://10.1.0.10:5000/fwupdate.bin","1");
+    update_http.before_update=[]
+    {
+        Serial.print("Checking for updates... ");
+    };
+    update_http.on_update_ok=[]
+    {
+        Serial.println("ok. Rebooting.");
+    };
+    update_http.on_update_error=[]
+    {
+        Serial.print("error");
+    };
+    update_http.on_update_up_to_date=[]
+    {
+        Serial.print("already up to date");
+    };
+
     mqtt.begin("10.1.0.10",client_id,"esp8266","esp8266");
     mqtt.on_connected=[&]
     {
@@ -95,6 +116,8 @@ void setup() {
     {
         Serial.print("Pin0 changed to ");
         Serial.println(v);
+        if(v)
+            update_http.check();
     };
     
     pin5.begin(5,gpio_pin::pin_in_pullup);
