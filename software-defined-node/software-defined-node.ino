@@ -4,7 +4,7 @@
 
 #include "config.h"
 #include "wifi_connector.h"
-#include "ota_handler.h"
+#include "updater_ota.h"
 #include "mqtt_handler.h"
 
 #include "sensor_dht22.h"
@@ -16,7 +16,7 @@
 
 String client_id;
 wifi_connector wifi_con;
-ota_handler ota;
+updater_ota update_ota;
 mqtt_handler mqtt;
 sensor_dht22 dht22;
 gpio_pin pin0;
@@ -47,11 +47,11 @@ void setup() {
     wifi_con.on_connected=[&]
     {
         Serial.println("Connected to WiFi");
-        ota.begin();
+        update_ota.begin();
     };
     
-    ota.set_password(OTA_PASS);
-    ota.set_hostname("snd");
+    update_ota.set_password(OTA_PASS);
+    update_ota.set_hostname("snd");
     
     mqtt.begin("10.1.0.10",client_id,"esp8266","esp8266");
     mqtt.on_connected=[&]
@@ -107,7 +107,7 @@ void setup() {
 
 void loop() {
     wifi_con.update();
-    ota.update();
+    update_ota.update();
     mqtt.update();
     dht22.update();
     pin0.update();
