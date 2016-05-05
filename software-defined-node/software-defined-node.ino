@@ -1,6 +1,7 @@
 #include <ArduinoOTA.h>
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
+#include <ArduinoJson.h>
 
 #include "config.h"
 #include "wifi_connector.h"
@@ -26,6 +27,56 @@ gpio_pin pin5;
 
 unsigned int ticks_per_second=30;
 unsigned long wait_ms=1000/ticks_per_second;
+
+char json_str[]=R"({"name":"some-node","config-version":1,"features":[{"type":"gpio","pin":0,"dir":"in_pullup","post-on-change":true,"topic":"/foo"},{"type":"gpio","pin":13,"dir":"output","post-on-change":true,"topic":"/foo"}]})";
+
+
+void parse_config()
+{
+    DynamicJsonBuffer json;
+    JsonObject& root=json.parseObject(json_str);
+    Serial.print("name: ");
+    Serial.println(root["name"].asString());
+    Serial.print("config-version: ");
+    Serial.println(root["config-version"].asString());
+
+    JsonArray& features=root["features"].asArray();
+
+    for(JsonObject& feature: features)
+    {
+        Serial.print("feature type: ");
+        Serial.print(feature["type"].asString());
+        feature.printTo(Serial);
+        Serial.println();
+
+        if(feature["type"]=="gpio")
+        {
+            int pin=feature["pin"];
+            gpio_pin::pin_dir dir;
+            if(feature["dir"]=="in")
+                dir=gpio_pin::pin_in;
+            else if(feature["dir"]=="in_pullup")
+                dir=gpio_pin::pin_in_pullup;
+            else
+                dir=gpio_pin::pin_out;
+
+            auto *p=new gpio_pin;
+            p->begin(pin,dir);
+
+            if((dir==gpio_pin::pin_in||dir==gpio_pin::pin_in_pullup) && (feature["post-on-change"]==true))
+            {
+                String topic=feature["topic"];
+                p->on_changed=[topic](bool v)
+                {
+                    Serial.print("Changed to");
+                    Serial.print(v);
+                    mqtt.publish(topic,v?"on":"off");
+                };
+            }
+        }
+    }
+}
+
 
 void setup() {
     // Init Hardware Serial on alternate Pins (RX:15/TX:13) instead of the
@@ -126,6 +177,8 @@ void setup() {
         Serial.print("Pin5 changed to ");
         Serial.println(v);
     };
+
+    parse_config();
 }
 
 void loop() {
