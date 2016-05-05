@@ -1,0 +1,13 @@
+{
+    "name": "some-node",
+    "config-version": 1,
+    "features": [
+        {
+            "type": "gpio",
+            "pin": 0,
+            "dir": "in_pullup",
+            "post-on-change": true,
+            "topic": "/foo"
+        }
+    ]
+}
