@@ -30,16 +30,20 @@ esp_headers = [
 ]
 
 
-@app.route("/fwupdate.bin")
-def handle_fwupdate():
+@app.route("/firmware.bin")
+def handle_firmware_update():
 
     for h in esp_headers:
-        if not h in request.headers:
-            return make_response("Not allowed", 403)
+        if h not in request.headers:
+            return make_response("403 Not allowed", 403)
 
-    print(request.headers)
-    return make_response("Not Modified", 304)
+    if request.headers["X-Esp8266-Sta-Mac"] not in modules:
+        return make_response("403 Not allowed", 403)
 
+     if False: # request.headers["X-Esp8266-Version"] < 0:
+         return make_response("304 Not Modified", 304)
+     else:
+        return send_from_directory("", "firmware.bin", mimetype="application/octet-stream", as_attachment=True)
 
 
 if __name__ == "__main__":
