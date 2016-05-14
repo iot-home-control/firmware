@@ -1,5 +1,8 @@
 from flask import Flask, request, make_response, send_from_directory
 
+from ZeroconfService import ZeroconfService
+
+zeroconf_service = ZeroconfService(name="ESP8266 Provisioning", port=5000, stype="_esp8266_provision._tcp")
 app = Flask(__name__)
 
 """
@@ -39,5 +42,6 @@ def handle_fwupdate():
 
 
 if __name__=="__main__":
+    zeroconf_service.publish()
     app.debug = True
     app.run(host="0.0.0.0")
