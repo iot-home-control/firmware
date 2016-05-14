@@ -41,7 +41,8 @@ def handle_fwupdate():
     return make_response("Not Modified", 304)
 
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     zeroconf_service.publish()
     app.debug = True
     app.run(host="0.0.0.0")
