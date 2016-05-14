@@ -14,16 +14,18 @@ X-Esp8266-Chip-Size: 4194304
 X-Esp8266-Free-Space: 2879488
 """
 
-modules=["18:FE:34:98:C2:82"]
-esp_headers=["X-Esp8266-Sta-Mac",
-        "X-Esp8266-Version",
-        "X-Esp8266-Mode",
-        "X-Esp8266-Sdk-Version",
-        "X-Esp8266-Ap-Mac",
-        "X-Esp8266-Sketch-Size",
-        "X-Esp8266-Chip-Size",
-        "X-Esp8266-Free-Space"
-        ]
+modules = ["18:FE:34:98:C2:82"]
+esp_headers = [
+    "X-Esp8266-Sta-Mac",
+    "X-Esp8266-Version",
+    "X-Esp8266-Mode",
+    "X-Esp8266-Sdk-Version",
+    "X-Esp8266-Ap-Mac",
+    "X-Esp8266-Sketch-Size",
+    "X-Esp8266-Chip-Size",
+    "X-Esp8266-Free-Space"
+]
+
 
 @app.route("/fwupdate.bin")
 def handle_fwupdate():
