@@ -1,4 +1,4 @@
-project('software-defined-node', 'cpp', default_options: ['buildtype=minsize'])
+project('led-strip', 'cpp', default_options: ['buildtype=minsize'])
 assert(meson.is_cross_build(), 'ESP8266 projects can only be built in a cross build environment.')
 
 sdk=subproject('esp8266_sdk')
@@ -23,7 +23,7 @@ deps = [
     RotaryEncoder.get_variable('lib')
 ]
 
-exe = executable('app.elf', ['led_strip.cpp', 'gpio_pin.cpp', 'mqtt_handler.cpp', 'sensor_dht22.cpp', 'software-defined-node.cpp', 'updater_http.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'rotary_encoder.cpp', 'trampoline_magic.cpp'], dependencies: deps)
+exe = executable('app.elf', ['led_strip.cpp', 'gpio_pin.cpp', 'mqtt_handler.cpp', 'sensor_dht22.cpp', 'node_led_strip.cpp', 'updater_http.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'rotary_encoder.cpp', 'trampoline_magic.cpp'], dependencies: deps)
 
 bin = custom_target('app.bin',
   input : exe,
@@ -31,11 +31,3 @@ bin = custom_target('app.bin',
   command : sdk.get_variable('esptoolize')
 )
 
-#run_target('upload',
-#  command : [esptool,
-#  '-C/usr/share/arduino/hardware/tools/avrdude.conf',
-#  '-v', '-v', '-v', '-v',
-#  '-patmega328p', '-carduino', '-P/dev/ttyACM0', '-b115200',
-#  '-D', '-Uflash:w:@0@:i'.format(hex.full_path())],
-#  depends : hex,
-#)
