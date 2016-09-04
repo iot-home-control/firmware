@@ -22,11 +22,8 @@ void updater_http::check()
     HTTPUpdateResult result=ESPhttpUpdate.update(url,version);
     if(result==HTTP_UPDATE_FAILED)
     {
-        Serial.println();
-        Serial.println(ESPhttpUpdate.getLastErrorString());
-        Serial.println();
         if(on_update_error)
-            on_update_error();
+            on_update_error(ESPhttpUpdate.getLastErrorString());
     }
     else if(result==HTTP_UPDATE_NO_UPDATES)
     {

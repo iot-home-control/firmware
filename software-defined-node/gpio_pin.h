@@ -3,8 +3,9 @@
 
 #include <Arduino.h>
 #include <functional>
+#include "ticker_component.h"
 
-class gpio_pin
+class gpio_pin: public ticker_component
 {
 private:
     unsigned char pin;

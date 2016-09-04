@@ -4,8 +4,9 @@
 #include <Arduino.h>
 #include <ArduinoOTA.h>
 #include <functional>
+#include "ticker_component.h"
 
-class updater_ota
+class updater_ota: public ticker_component
 {
 private:
     bool use_serial, run_default_handlers;

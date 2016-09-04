@@ -35,6 +35,7 @@ void mqtt_handler::begin(const String& host, const String& client_id, const Stri
     mqtt_id=client_id;
     mqtt_user=user;
     mqtt_pass=pass;
+    can_connect=true;
 }
 
 void mqtt_handler::update()
@@ -42,6 +43,9 @@ void mqtt_handler::update()
     unsigned long now=millis();
     if(!client.connected())
     {
+        if(!can_connect)
+            return;
+        
         if(connected)
         {
             connected=false;
@@ -95,5 +99,8 @@ void mqtt_handler::handle_topic(const String& name, topic_handler handler)
 
 void mqtt_handler::publish(const String& topic, const String& msg)
 {
+    if(!connected)
+        return;
+    
     client.publish(topic.c_str(),msg.c_str());
 }

@@ -10,6 +10,7 @@ private:
     String url, version;
 public:
     typedef std::function<void()> callback;
+    typedef std::function<void(const String& s)> callback_string;
     
     updater_http();
     void begin(const String& url, const String& version);
@@ -17,7 +18,7 @@ public:
     
     callback before_update;
     callback on_update_ok;
-    callback on_update_error;
+    callback_string on_update_error;
     callback on_update_up_to_date;
 };
 

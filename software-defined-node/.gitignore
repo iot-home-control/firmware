@@ -1,2 +1,5 @@
 config.h
 *.swp
+build*/
+*.pro.user
+*.log

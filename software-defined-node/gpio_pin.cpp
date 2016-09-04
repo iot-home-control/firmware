@@ -10,6 +10,12 @@ void gpio_pin::begin(unsigned char pin, pin_dir dir)
     pinMode(pin,dir);
     is_output=(dir==pin_out);
     is_input=!is_output;
+
+    /*int isr_index=allocate_trampoline([this]
+    {
+        int_state=digitalRead(this->pin);
+    });
+    attachInterrupt(digitalPinToInterrupt(pin),tramps[isr_index],CHANGE);*/
 }
 
 bool gpio_pin::read()
@@ -32,9 +38,9 @@ void gpio_pin::update()
     if(is_input)
     {
         bool state=digitalRead(pin);
-        if(state!=last_state)
+        if(/*int_*/state!=last_state)
         {
-            last_state=state;
+            last_state=/*int_*/state;
             if(on_changed)
                 on_changed(last_state);
         }

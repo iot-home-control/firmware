@@ -3,8 +3,9 @@
 
 #include <Arduino.h>
 #include <functional>
+#include "ticker_component.h"
 
-class wifi_connector
+class wifi_connector: public ticker_component
 {
 private:
     String ssid, password;

@@ -7,8 +7,9 @@
 
 #include <functional>
 #include <vector>
+#include "ticker_component.h"
 
-class mqtt_handler
+class mqtt_handler: public ticker_component
 {
 public:
     typedef std::function<void(char* topic, unsigned char* data, unsigned int len)> topic_handler;
@@ -28,6 +29,7 @@ private:
     unsigned long subscription_check_interval, last_subscription_check;
     String mqtt_id, mqtt_user, mqtt_pass;
     std::vector<handler_pair> handlers;
+    bool can_connect=false;
 
     void mqtt_callback(char* topic, uint8_t* data, unsigned int length);
     void check_subscriptions();
