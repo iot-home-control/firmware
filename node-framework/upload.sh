@@ -8,9 +8,9 @@
 
 set -e
 
-TOOL_ROOT="/home/trilader/.arduino15/packages/esp8266"
-ESP_TOOL="$TOOL_ROOT/tools/esptool/0.4.8/esptool"
-OTA_TOOL="$TOOL_ROOT/hardware/esp8266/2.3.0-rc2/tools/espota.py"
+TOOL_ROOT="/home/trilader/code/esp8266-sdk/tools"
+ESP_TOOL="$TOOL_ROOT/esptool/esptool"
+OTA_TOOL="$TOOL_ROOT/espota.py"
 
 function usage()
 {
@@ -25,7 +25,7 @@ fi
 
 if [ "$1" == "serial" ]; then
     shift
-    PORT="$1"
+    PORT="${1:-/dev/ttyUSB0}"
     BAUD="${2:-115200}"
     $ESP_TOOL -cd nodemcu -cp $PORT -cb $BAUD -ca 0x0000 -cf build/app.bin
 elif [ "$1" == "ota" ]; then
