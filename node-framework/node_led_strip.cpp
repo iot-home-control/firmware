@@ -29,7 +29,7 @@ updater_ota update_ota;
 updater_http update_http;
 mqtt_handler mqtt;
 
-gpio_pin pin0;
+//gpio_pin pin0;
 rotary_encoder encoder;
 led_strip leds(15);
 
@@ -50,7 +50,6 @@ RgbColor colors[]={
   {64, 156, 255}, //Clear Blue Sky (20000K)
 };
 unsigned int preset_index=0;
-int encoder_last=0;
 
 void setup() {
     // Init Hardware Serial on alternate Pins (RX:15/TX:13) instead of the
@@ -135,7 +134,7 @@ void setup() {
         Serial.println(v);
     };
 */
-    pin0.begin(0,gpio_pin::pin_in_pullup);
+    /*pin0.begin(0,gpio_pin::pin_in_pullup);
     pin0.on_changed=[&](bool v)
     {
         static bool state=false;
@@ -156,9 +155,36 @@ void setup() {
         }
         state=!state;
     };
-    components.push_back(&pin0);
+    components.push_back(&pin0);*/
 
-    encoder.begin(5,4);
+    encoder.begin(5,4,0);
+    encoder.on_encoder_changed([&](int delta)
+    {
+        preset_index=std::max(0u, std::min(preset_index+delta, ARRAY_COUNT(colors)-1));
+        leds.fade_to_color(colors[preset_index], 1000);
+        Serial.print("Preset:");
+        Serial.println(preset_index);
+    });
+    encoder.btn.on_short_click([]
+    {
+        leds.rainbow(1000);
+    });
+    encoder.btn.on_medium_click([]
+    {
+        static bool state=false;
+        if(state)
+        {
+            Serial.println("Turning off.");
+            leds.turn_off(500);
+        }
+        else
+        {
+            Serial.println("Turning on.");
+            leds.turn_on(colors[preset_index], 500);
+        }
+        state=!state;
+    });
+
     components.push_back(&encoder);
     leds.fade_to_color(colors[preset_index], 1000);
 }
@@ -171,17 +197,6 @@ void loop() {
     for(auto& component: components)
     {
         component->update();
-    }
-
-    int encoder_curr=encoder.get_position();
-    if(encoder_curr!=encoder_last)
-    {
-        int diff=encoder_curr-encoder_last;
-        preset_index=std::max(0u, std::min(preset_index+diff, ARRAY_COUNT(colors)-1));
-        leds.fade_to_color(colors[preset_index], 1000);
-        Serial.print("Preset:");
-        Serial.println(preset_index);
-        encoder_last=encoder_curr;
     }
 
     unsigned long used_ms=millis()-start_ms;
