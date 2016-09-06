@@ -14,10 +14,11 @@ HEADERS += \
     gpio_pin.h \
     config.h \
     led_strip.h \
-    rotary_encoder.h
+    rotary_encoder.h \
+    button.h
 
 SOURCES += \
-    software-defined-node.cpp \
+    node_led_strip.cpp \
     updater_http.cpp \
     updater_ota.cpp \
     wifi_connector.cpp \
@@ -26,4 +27,5 @@ SOURCES += \
     gpio_pin.cpp \
     led_strip.cpp \
     rotary_encoder.cpp \
-    trampoline_magic.cpp
+    trampoline_magic.cpp \
+    button.cpp
