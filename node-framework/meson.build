@@ -23,7 +23,7 @@ deps = [
     RotaryEncoder.get_variable('lib')
 ]
 
-exe = executable('app.elf', ['led_strip.cpp', 'gpio_pin.cpp', 'mqtt_handler.cpp', 'sensor_dht22.cpp', 'node_led_strip.cpp', 'updater_http.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'rotary_encoder.cpp', 'trampoline_magic.cpp'], dependencies: deps)
+exe = executable('app.elf', ['led_strip.cpp', 'gpio_pin.cpp', 'mqtt_handler.cpp', 'sensor_dht22.cpp', 'node_led_strip.cpp', 'updater_http.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'rotary_encoder.cpp', 'button.cpp', 'trampoline_magic.cpp'], dependencies: deps)
 
 bin = custom_target('app.bin',
   input : exe,
