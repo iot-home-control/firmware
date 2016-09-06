@@ -65,7 +65,7 @@ void setup() {
     }
     Serial.println();
 
-    client_id="node-"+String(ESP.getChipId());
+    client_id="esp8266-"+String(ESP.getChipId(), HEX);
     Serial.print("Client-Id: ");
     Serial.println(client_id);
 
@@ -75,7 +75,9 @@ void setup() {
     wifi_con.begin(WIFI_SSID, WIFI_PASS);
     wifi_con.on_connected=[&]
     {
-        Serial.println("Connected to WiFi");
+        Serial.print("Connected to WiFi (");
+        Serial.print(WIFI_SSID);
+        Serial.println(")");
         update_ota.begin();
     };
     
