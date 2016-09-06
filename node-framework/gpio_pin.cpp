@@ -10,6 +10,8 @@ void gpio_pin::begin(unsigned char pin, pin_dir dir)
     pinMode(pin,dir);
     is_output=(dir==pin_out);
     is_input=!is_output;
+    if(is_input)
+        last_state=digitalRead(pin);
 
     /*int isr_index=allocate_trampoline([this]
     {
