@@ -10,12 +10,15 @@ private:
     NeoPixelAnimator animator;
     NeoGamma<NeoGammaTableMethod> gamma;
     size_t strip_length;
+    bool _is_on=false;
 public:
     NeoPixelBus<NeoGrbFeature, NeoEsp8266Uart800KbpsMethod> leds;
     led_strip(size_t length);
 
     void begin();
     void update() override;
+
+    bool is_on() const;
 
     void rainbow(size_t ms);
     void fade_to_color(const HslColor& color, size_t fade_duration_ms);

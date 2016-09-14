@@ -9,6 +9,7 @@ void led_strip::begin()
     leds.Begin();
     leds.ClearTo(RgbColor(0,0,0));
     leds.Show();
+    _is_on=false;
 }
 
 void led_strip::update()
@@ -20,8 +21,16 @@ void led_strip::update()
     }
 }
 
+bool led_strip::is_on() const
+{
+    return _is_on;
+}
+
 void led_strip::rainbow(size_t ms)
 {
+    if(!is_on())
+        return;
+
     for (uint16_t pixel_index=0;pixel_index<strip_length;pixel_index++)
     {
         float s=1.0, l=0.01;
@@ -74,6 +83,7 @@ void led_strip::set_color_to(const HslColor &color)
 
 void led_strip::turn_on(const HslColor &color, size_t fade_duration_ms)
 {
+    _is_on=true;
     if(fade_duration_ms!=0)
     {
         HslColor off_color=color;
@@ -91,6 +101,7 @@ void led_strip::turn_on(const HslColor &color, size_t fade_duration_ms)
 
 void led_strip::turn_off(size_t fade_duration_ms)
 {
+    _is_on=false;
     for (uint16_t pixel_index=0;pixel_index<strip_length;pixel_index++)
     {
         HslColor color_start=leds.GetPixelColor(pixel_index);
