@@ -29,7 +29,6 @@ updater_ota update_ota;
 updater_http update_http;
 mqtt_handler mqtt;
 
-//gpio_pin pin0;
 rotary_encoder encoder;
 led_strip leds(15);
 
@@ -49,7 +48,52 @@ RgbColor colors[]={
   {201, 226, 255}, //Overcast Sky (7000K)
   {64, 156, 255}, //Clear Blue Sky (20000K)
 };
+
+HslColor presets_hsl[]={
+  {0.0833, 1.0, 0.580}, //Candle (1900K)
+  {0.0805, 1.0, 0.780}, //40W Tungsten (2600K)
+  {0.1388, 1.0, 0.833}, //100W Tungsten (2850K)
+  {0.0916, 1.0, 0.939}, //Halogen (3200K)
+  {0.0916, 1.0, 0.978}, //Carbon Arc (5200K)
+  {0.1666, 1.0, 0.992}, //High Noon Sun (5400K)
+  {0.0000, 1.0, 1.000}, //Direct Sunlight (6000K)
+  {0.4944, 1.0, 0.894}, //Overcast Sky (7000K)
+  {0.5861, 1.0, 0.625}, //Clear Blue Sky (20000K)
+};
 unsigned int preset_index=0;
+float brightness = 0.1;
+
+template<typename T>
+T clamp(T min, T value, T max)
+{
+    if(value<min)
+        return min;
+    if(value>max)
+        return max;
+    return value;
+}
+
+HslColor get_current_color()
+{
+    HslColor c = presets_hsl[preset_index];
+    c.L *= brightness;
+
+    return c;
+}
+
+void apply_preset(bool fade=true)
+{
+    if(!leds.is_on())
+        return;
+
+    HslColor c = get_current_color();
+    if(fade)
+        leds.fade_to_color(c, 500);
+    else
+        leds.set_color_to(c);
+}
+
+
 
 void setup() {
     // Init Hardware Serial on alternate Pins (RX:15/TX:13) instead of the
@@ -65,6 +109,10 @@ void setup() {
     }
     Serial.println();
 
+    Serial.print("Built on ");
+    Serial.print(__DATE__);
+    Serial.print(", ");
+    Serial.println(__TIME__);
     client_id="esp8266-"+String(ESP.getChipId(), HEX);
     Serial.print("Client-Id: ");
     Serial.println(client_id);
@@ -136,40 +184,23 @@ void setup() {
         Serial.println(v);
     };
 */
-    /*pin0.begin(0,gpio_pin::pin_in_pullup);
-    pin0.on_changed=[&](bool v)
-    {
-        static bool state=false;
-        //Serial.print("Pin0 changed to ");
-        //Serial.println(v);
-        if(!v)
-            return;
-
-        if(state)
-        {
-            Serial.println("Turning off.");
-            leds.turn_off(500);
-        }
-        else
-        {
-            Serial.println("Turning on.");
-            leds.turn_on(colors[preset_index], 500);
-        }
-        state=!state;
-    };
-    components.push_back(&pin0);*/
 
     encoder.begin(5,4,0);
     encoder.on_encoder_changed([&](int delta)
     {
-        preset_index=std::max(0u, std::min(preset_index+delta, ARRAY_COUNT(colors)-1));
-        leds.fade_to_color(colors[preset_index], 1000);
-        Serial.print("Preset:");
-        Serial.println(preset_index);
+        brightness+=delta*0.01;
+        brightness=clamp(0.0f, brightness, 1.0f);
+        Serial.print("Brightness: ");
+        Serial.println(brightness);
+        apply_preset(false);
     });
     encoder.btn.on_short_click([]
     {
-        leds.rainbow(1000);
+        preset_index=++preset_index%(ARRAY_COUNT(presets_hsl)-1);
+        //leds.fade_to_color(presets_hsl[preset_index], 500);
+        apply_preset();
+        Serial.print("Preset:");
+        Serial.println(preset_index);
     });
     encoder.btn.on_medium_click([]
     {
@@ -182,15 +213,15 @@ void setup() {
         else
         {
             Serial.println("Turning on.");
-            leds.turn_on(colors[preset_index], 500);
+            leds.turn_on(get_current_color(),500);
         }
         state=!state;
     });
 
     components.push_back(&encoder);
-    leds.fade_to_color(colors[preset_index], 1000);
+    //leds.fade_to_color(colors[preset_index], 1000);
+    //apply_preset();
 }
-
 void loop() {
     unsigned long start_ms=millis();
     wifi_con.update();
