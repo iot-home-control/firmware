@@ -61,7 +61,7 @@ HslColor presets_hsl[]={
   {0.5861, 1.0, 0.625}, //Clear Blue Sky (20000K)
 };
 unsigned int preset_index=0;
-float brightness = 0.1;
+float relative_brightness = 0.1;
 
 template<typename T>
 T clamp(T min, T value, T max)
@@ -76,7 +76,7 @@ T clamp(T min, T value, T max)
 HslColor get_current_color()
 {
     HslColor c = presets_hsl[preset_index];
-    c.L *= brightness;
+    c.L *= relative_brightness;
 
     return c;
 }
@@ -188,10 +188,10 @@ void setup() {
     encoder.begin(5,4,0);
     encoder.on_encoder_changed([&](int delta)
     {
-        brightness+=delta*0.01;
-        brightness=clamp(0.0f, brightness, 1.0f);
+        relative_brightness+=delta*0.01;
+        relative_brightness=clamp(0.0f, relative_brightness, 1.0f);
         Serial.print("Brightness: ");
-        Serial.println(brightness);
+        Serial.println(relative_brightness);
         apply_preset(false);
     });
     encoder.btn.on_short_click([]
