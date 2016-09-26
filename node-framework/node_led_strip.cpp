@@ -30,7 +30,7 @@ updater_http update_http;
 mqtt_handler mqtt;
 
 rotary_encoder encoder;
-led_strip leds(15);
+led_strip leds(62);
 
 float ticks_per_second=30.0f;
 unsigned long cycle_time_ms=(int)(1000/ticks_per_second);
@@ -61,7 +61,7 @@ HslColor presets_hsl[]={
   {0.5861, 1.0, 0.625}, //Clear Blue Sky (20000K)
 };
 unsigned int preset_index=0;
-float relative_brightness = 0.1;
+float relative_brightness = 1.0;
 
 template<typename T>
 T clamp(T min, T value, T max)
@@ -220,6 +220,7 @@ void setup() {
 
     components.push_back(&encoder);
     //leds.fade_to_color(colors[preset_index], 1000);
+    leds.turn_on(get_current_color(), 500);
     //apply_preset();
 }
 void loop() {
