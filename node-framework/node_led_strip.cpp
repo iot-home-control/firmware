@@ -140,7 +140,7 @@ void setup() {
         Serial.println("Already up to date");
     };
 
-    //mqtt.begin("10.1.0.10",client_id,"esp8266","esp8266");
+    //mqtt.begin("10.1.0.1",client_id,"esp8266","esp8266");
     mqtt.on_connected=[&]
     {
         Serial.println("Connected to MQTT");
@@ -178,6 +178,85 @@ void setup() {
         Serial.println(v);
     };
 */
+
+    auto led_action_msg_handler=[&](char* topic, unsigned char* data, unsigned int length)
+    {
+        (void)topic;
+        char s[length+1];
+        memcpy(s,data,length);
+        s[length]=0;
+        String data_str(s);
+        if(data_str=="on")
+        {
+            Serial.println("[MQTT] Turning on.");
+            leds.turn_on(get_current_color(),500);
+        }
+        else if(data_str=="off")
+        {
+            Serial.println("[MQTT] Turning off.");
+            leds.turn_off(500);
+        }
+        else if(data_str.startsWith("preset="))
+        {
+            unsigned int preset_num = data_str.substring(7).toInt();
+            Serial.print("[MQTT] Setting preset ");
+            Serial.println(preset_num);
+            preset_index=clamp(0u,preset_num,ARRAY_COUNT(presets_hsl)-1);
+            apply_preset();
+        }
+
+    };
+
+    mqtt.handle_topic("/leds/action", led_action_msg_handler);
+
+    auto led_color_msg_handler=[&](char* topic, unsigned char* data, unsigned int length)
+    {
+        char s[length+1];
+        memcpy(s,data,length);
+        s[length]=0;
+        String data_str(s);
+
+        String the_topic(topic);
+        if(the_topic.endsWith("rgb"))
+        {
+            int rgb[3]={};
+            int color=0;
+            size_t last_comma=0;
+            while(color<3)
+            {
+                size_t comma = data_str.indexOf(',', last_comma);
+                Serial.print("found comma at ");
+                Serial.println(comma);
+                if(comma!=-1)
+                {
+                    rgb[color]=data_str.substring(last_comma,comma).toInt();
+                    last_comma=comma+1;
+                    color++;
+                }
+                else if(comma==-1 && color==2)
+                {
+                    rgb[color]=data_str.substring(last_comma).toInt();
+                    last_comma=comma+1;
+                    color++;
+                }
+                else
+                    break;
+            }
+            Serial.println("[MQTT] Setting color to ");
+            Serial.print(rgb[0]);
+            Serial.print(",");
+            Serial.print(rgb[1]);
+            Serial.print(",");
+            Serial.println(rgb[2]);
+
+            leds.fade_to_color(RgbColor((uint8_t)rgb[0],
+                                        (uint8_t)rgb[1],
+                                        (uint8_t)rgb[2]),
+                               500);
+        }
+    };
+
+    mqtt.handle_topic("/leds/color/rgb", led_color_msg_handler);
 
     encoder.begin(5,4,0);
     encoder.on_encoder_changed([&](int delta)
