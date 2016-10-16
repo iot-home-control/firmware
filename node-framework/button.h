@@ -35,7 +35,7 @@ private:
     const unsigned long click_minimum=25;
     //const unsigned long short_click=150;
     const unsigned long medium_click=250;
-    const unsigned long long_click=400;
+    const unsigned long long_click=700;
 
     event_trigger trigger;
     void isr();
