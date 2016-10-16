@@ -8,6 +8,8 @@
 #include <WiFiUdp.h>
 #include <ESP8266mDNS.h>
 
+#include <DallasTemperature.h>
+
 #include "config.h"
 #include "wifi_connector.h"
 #include "updater_ota.h"
