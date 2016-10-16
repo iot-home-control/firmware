@@ -18,6 +18,7 @@
 #include "gpio_pin.h"
 #include "led_strip.h"
 #include "rotary_encoder.h"
+#include "util.h"
 
 #ifndef HAS_CONFIG_H
 #error "config.h not found!"
@@ -62,16 +63,6 @@ HslColor presets_hsl[]={
 };
 unsigned int preset_index=0;
 float relative_brightness = 1.0;
-
-template<typename T>
-T clamp(T min, T value, T max)
-{
-    if(value<min)
-        return min;
-    if(value>max)
-        return max;
-    return value;
-}
 
 HslColor get_current_color()
 {

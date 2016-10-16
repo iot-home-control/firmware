@@ -1,4 +1,5 @@
 #pragma once
+#include "util.h"
 #include <functional>
 #include <Arduino.h>
 
@@ -36,7 +37,6 @@ namespace foo
 }
 
 #define NUM_ISR_TRAMPS 20
-#define ARRAY_COUNT(arr) (sizeof((arr))/sizeof((arr)[0]))
 extern std::function<void()> isr_trampolines[NUM_ISR_TRAMPS];
 
 template<int N>

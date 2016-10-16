@@ -15,7 +15,8 @@ HEADERS += \
     config.h \
     led_strip.h \
     rotary_encoder.h \
-    button.h
+    button.h \
+    util.h
 
 SOURCES += \
     node_led_strip.cpp \
