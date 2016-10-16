@@ -1,10 +1,11 @@
 #ifndef SENSOR_DHT22_H
 #define SENSOR_DHT22_H
 
+#include "ticker_component.h"
 #include <DHT.h>
 #include <functional>
 
-class sensor_dht22
+class sensor_dht22: public ticker_component
 {
 private:
     class wrapper
