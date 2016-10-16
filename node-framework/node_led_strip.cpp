@@ -8,6 +8,8 @@
 #include <ESP8266mDNS.h>
 #include <ESP8266HTTPClient.h>
 
+#include <memory>
+
 #include "config.h"
 #include "wifi_connector.h"
 #include "updater_ota.h"
@@ -32,6 +34,7 @@ mqtt_handler mqtt;
 
 rotary_encoder encoder;
 led_strip leds(62);
+//led_strip leds(15);
 
 float ticks_per_second=30.0f;
 unsigned long cycle_time_ms=(int)(1000/ticks_per_second);
@@ -187,6 +190,11 @@ void setup() {
     });
     encoder.btn.on_short_click([]
     {
+        if(leds.is_playing_animation())
+        {
+            leds.stop_animation();
+            return;
+        }
         preset_index=++preset_index%(ARRAY_COUNT(presets_hsl)-1);
         //leds.fade_to_color(presets_hsl[preset_index], 500);
         apply_preset();
@@ -207,6 +215,16 @@ void setup() {
             leds.turn_on(get_current_color(),500);
         }
         state=!state;
+    });
+
+    encoder.btn.on_long_click([]
+    {
+        //leds.play_animation(std::make_shared<rainbow_animation>(500));
+        //leds.rainbow(2000);
+        //leds.play_animation(new test_animation());
+        //leds.play_animation_rainbow(2500, true);
+        //leds.play_animation_sunrise(10000);
+        //leds.play_animation_warp_core(HslColor(0.55,1.0,0.4),2000,true);
     });
 
     components.push_back(&encoder);
