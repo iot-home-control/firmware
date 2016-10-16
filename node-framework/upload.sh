@@ -14,8 +14,8 @@ OTA_TOOL="$TOOL_ROOT/espota.py"
 
 function usage()
 {
-    echo "Usage: $0 serial <PORT> [BAUD]"
-    echo "       $0 ota <NAME> [PASS] [-p PORT]"
+    echo "Usage: $0 <FILE> serial <PORT> [BAUD]"
+    echo "       $0 <FILE> ota <NAME> [PASS] [-p PORT]"
     exit 1
 }
 
@@ -23,11 +23,19 @@ if [ "$#" -lt 1 ]; then
     usage
 fi
 
+FILE="build/$1.bin"
+
+if [ ! -e "$FILE" ]; then
+    usage
+else
+    shift
+fi
+
 if [ "$1" == "serial" ]; then
     shift
     PORT="${1:-/dev/ttyUSB0}"
     BAUD="${2:-115200}"
-    $ESP_TOOL -cd nodemcu -cp $PORT -cb $BAUD -ca 0x0000 -cf build/app.bin
+    $ESP_TOOL -cd nodemcu -cp $PORT -cb $BAUD -ca 0x0000 -cf "$FILE"
 elif [ "$1" == "ota" ]; then
     shift
     ARGS=""
@@ -37,7 +45,7 @@ elif [ "$1" == "ota" ]; then
     else
         ARGS="$ARGS -p 8266"
     fi
-    python $OTA_TOOL -d -i $(avahi-resolve-host-name -4 "${1}.local" | cut -f2) $ARGS -f build/app.bin
-else 
+    python $OTA_TOOL -d -i $(avahi-resolve-host-name -4 "${1}.local" | cut -f2) $ARGS -f "$FILE"
+else
     usage
 fi
