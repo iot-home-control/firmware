@@ -2,3 +2,5 @@ ArduinoJson: https://github.com/bblanchon/ArduinoJson/releases/download/v5.6.4/A
 PubSubClient: https://github.com/knolleary/pubsubclient/archive/v2.6.zip
 DHT: https://github.com/adafruit/DHT-sensor-library/archive/1.2.3.zip
 NeoPixelBus: https://github.com/Makuna/NeoPixelBus/archive/2.1.4.zip
+OneWire: https://github.com/PaulStoffregen/OneWire
+Arduino-Temperature-Control-Library: https://github.com/milesburton/Arduino-Temperature-Control-Library
