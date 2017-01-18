@@ -62,13 +62,13 @@ void led_strip::fade_to_color(const HslColor &color, size_t fade_duration_ms)
         AnimUpdateCallback cb_update=[=](AnimationParam param) mutable
         {
             // progress will start at 0.0 and end at 1.0
-            auto set_color = gamma.Correct(
+            auto set_color = //gamma.Correct(
                         RgbColor(
                             HslColor::LinearBlend<NeoHueBlendShortestDistance>(
                                 color_start,
                                 color,
                                 param.progress)
-                            )
+                          //  )
                         );
             leds.SetPixelColor(pixel_index, set_color);
         };
