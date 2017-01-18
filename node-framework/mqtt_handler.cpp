@@ -1,6 +1,26 @@
 #include "mqtt_handler.h"
 #include <algorithm>
 
+#if 0
+#define spl Serial.println
+#define sp Serial.println
+#else
+#define spl
+#define sp
+#endif
+
+int get_retry_delay(int retry_count, int retry_interval)
+{
+        if(retry_count < 5)
+        {
+            return retry_interval;
+        } 
+        else
+        {
+            return 2*retry_count*retry_interval;
+        }
+}
+
 void mqtt_handler::mqtt_callback(char* topic, uint8_t* data, unsigned int length)
 {
     String the_topic(topic);
@@ -22,7 +42,7 @@ void mqtt_handler::check_subscriptions()
     last_subscription_check=millis();
 }
 
-mqtt_handler::mqtt_handler(): client(wifi_client), connecting(false), connected(false), connection_retry_interval(1000), subscription_check_interval(2500)
+mqtt_handler::mqtt_handler(): client(wifi_client), connecting(false), connected(false), connection_retry_interval(1000), connection_retry_count(0), subscription_check_interval(2500)
 {
 }
 
@@ -43,6 +63,7 @@ void mqtt_handler::update()
     unsigned long now=millis();
     if(!client.connected())
     {
+        spl("!client.connected()");
         if(!can_connect)
             return;
         
@@ -55,23 +76,30 @@ void mqtt_handler::update()
             
             if(on_disconnected)
                 on_disconnected();
+            spl("connected");
         }
         if(!connecting)
         {
+            spl("!connecting start");
             connecting=true;
             connecting_start_time=now;
             client.connect(mqtt_id.c_str(), mqtt_user.c_str(), mqtt_pass.c_str());
+            spl("!connecting stop");
         }
-        else if(now-connecting_start_time>connection_retry_interval)
+        else if(now-connecting_start_time>get_retry_delay(connection_retry_count, connection_retry_interval))
         {
+            connection_retry_count++;
             // retry
+            spl("retry");
             connecting=false;
         }
     }
     else
     {
+        spl("client.connected()");
         if(connecting)
         {
+            spl("connecting");
             connecting=false;
             connected=true;
             
@@ -82,6 +110,7 @@ void mqtt_handler::update()
         }
         if(now-last_subscription_check>subscription_check_interval)
         {
+            spl("check_subscriptions");
             check_subscriptions();
         }
         client.loop();

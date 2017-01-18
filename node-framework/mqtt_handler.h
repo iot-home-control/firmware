@@ -26,6 +26,7 @@ private:
     PubSubClient client;
     bool connecting, connected;
     unsigned long connection_retry_interval, connecting_start_time;
+    unsigned int  connection_retry_count;
     unsigned long subscription_check_interval, last_subscription_check;
     String mqtt_id, mqtt_user, mqtt_pass;
     std::vector<handler_pair> handlers;
