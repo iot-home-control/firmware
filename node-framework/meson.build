@@ -52,3 +52,21 @@ temperature_sensor_bin = custom_target('temperature_sensor.bin',
   output : 'temperature_sensor.bin',
   command : sdk.get_variable('esptoolize')
 )
+
+
+deps_power_switch = [
+    sdk.get_variable('core'),
+    arduino.get_variable('ESP8266WiFi'),
+    arduino.get_variable('ArduinoOTA'),
+    arduino.get_variable('ESP8266HTTPClient'),
+    arduino.get_variable('ESP8266mDNS'),
+    PubSubClient.get_variable('lib')
+]
+
+power_switch_exe = executable('power_switch.elf', ['node_power_switch.cpp', 'mqtt_handler.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'button.cpp', 'gpio_pin.cpp', 'trampoline_magic.cpp'], dependencies: deps_power_switch)
+
+power_switch_bin = custom_target('power_switch.bin',
+  input : power_switch_exe,
+  output : 'power_switch.bin',
+  command : sdk.get_variable('esptoolize')
+)
