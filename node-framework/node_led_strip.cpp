@@ -196,6 +196,31 @@ void setup() {
             Serial.println("[MQTT] Turning off.");
             leds.turn_off(500);
         }
+        else if(data_str=="sunrise")
+        {
+            Serial.println("[MQTT] Starting Sunrise");
+            leds.play_animation_sunrise(600000);
+        }
+        else if(data_str=="warp_start")
+        {
+            Serial.println("[MQTT] Starting WARP-CORE");
+            leds.play_animation_warp_core(HslColor(0.55,1.0,0.4),2000,true);
+        }
+        else if(data_str=="warp_stop")
+        {
+            Serial.println("[MQTT] Starting WARP-CORE");
+            leds.play_animation_warp_core(HslColor(0.55,1.0,0.4),2000,false);
+        }
+        else if(data_str=="rainbow_start")
+        {
+            Serial.println("[MQTT] Starting rainbow");
+            leds.play_animation_rainbow(2500, true);
+        }
+        else if(data_str=="rainbow_stop")
+        {
+            Serial.println("[MQTT] Starting rainbow");
+            leds.play_animation_rainbow(2500, false);
+        }
         else if(data_str.startsWith("preset="))
         {
             unsigned int preset_num = data_str.substring(7).toInt();
