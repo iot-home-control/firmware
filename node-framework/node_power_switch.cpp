@@ -105,7 +105,7 @@ void setup() {
         Serial.println("Already up to date");
     };*/
 
-    mqtt.begin("10.7.14.10",client_id,"esp","kH2i1tjLqUvGgHecNUEl");
+    mqtt.begin(MQTT_HOST,client_id,MQTT_USER,MQTT_PASS);
     mqtt.on_connected=[&]
     {
         Serial.println("Connected to MQTT");

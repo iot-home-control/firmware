@@ -140,7 +140,7 @@ void setup() {
         Serial.println("Already up to date");
     };
 
-    //mqtt.begin("10.1.0.1",client_id,"esp8266","esp8266");
+    //mqtt.begin(MQTT_HOST,client_id,MQTT_USER,MQTT_PASS);
     mqtt.on_connected=[&]
     {
         Serial.println("Connected to MQTT");

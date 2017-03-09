@@ -61,7 +61,7 @@ void setup() {
     update_ota.set_password(OTA_PASS);
     update_ota.set_hostname("temp-sensor");
     
-    mqtt.begin("10.1.0.16",client_id,"esp8266","esp8266");
+    mqtt.begin(MQTT_HOST,client_id,MQTT_USER,MQTT_PASS);
     mqtt.on_connected=[&]
     {
         Serial.println("Connected to MQTT");
