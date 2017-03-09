@@ -47,7 +47,11 @@ void setup() {
     }
     Serial.println();
 
-    client_id="node-"+String(ESP.getChipId());
+    Serial.print("Built on ");
+    Serial.print(__DATE__);
+    Serial.print(", ");
+    Serial.println(__TIME__);
+    client_id="esp8266-"+String(ESP.getChipId(), HEX);
     Serial.print("Client-Id: ");
     Serial.println(client_id);
 
