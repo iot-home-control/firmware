@@ -85,6 +85,8 @@ void setup() {
         Serial.print("Connected to WiFi (");
         Serial.print(WIFI_SSID);
         Serial.println(")");
+        Serial.print("IP: ");
+        Serial.println(WiFi.localIP());
         update_ota.begin();
     };
     

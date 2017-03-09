@@ -54,7 +54,11 @@ void setup() {
     wifi_con.begin(WIFI_SSID, WIFI_PASS);
     wifi_con.on_connected=[&]
     {
-        Serial.println("Connected to WiFi");
+        Serial.print("Connected to WiFi (");
+        Serial.print(WIFI_SSID);
+        Serial.println(")");
+        Serial.print("IP: ");
+        Serial.println(WiFi.localIP());
         update_ota.begin();
     };
     
