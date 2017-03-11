@@ -85,6 +85,8 @@ void setup() {
         Serial.print("Connected to WiFi (");
         Serial.print(WIFI_SSID);
         Serial.println(")");
+        Serial.print("IP: ");
+        Serial.println(WiFi.localIP());
         update_ota.begin();
     };
     
@@ -105,7 +107,7 @@ void setup() {
         Serial.println("Already up to date");
     };*/
 
-    mqtt.begin("10.7.14.10",client_id,"esp","kH2i1tjLqUvGgHecNUEl");
+    mqtt.begin(MQTT_HOST,client_id,MQTT_USER,MQTT_PASS);
     mqtt.on_connected=[&]
     {
         Serial.println("Connected to MQTT");

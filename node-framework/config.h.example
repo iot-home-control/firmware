@@ -7,6 +7,9 @@
 #define WIFI_PASS "ASecurePassword"
 
 #define OTA_PASS "SomePassword"
-#define PROVISION_SERVER "10.0.0.1"
+
+#define MQTT_HOST "192.168.0.1"
+#define MQTT_USER "username"
+#define MQTT_PASS "password"
 
 #endif // CONFIG_H

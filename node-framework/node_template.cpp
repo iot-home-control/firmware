@@ -69,7 +69,11 @@ void setup() {
     }
     Serial.println();
 
-    client_id="node-"+String(ESP.getChipId());
+    Serial.print("Built on ");
+    Serial.print(__DATE__);
+    Serial.print(", ");
+    Serial.println(__TIME__);
+    client_id="esp8266-"+String(ESP.getChipId(), HEX);
     Serial.print("Client-Id: ");
     Serial.println(client_id);
 
@@ -79,7 +83,11 @@ void setup() {
     wifi_con.begin(WIFI_SSID, WIFI_PASS);
     wifi_con.on_connected=[&]
     {
-        Serial.println("Connected to WiFi");
+        Serial.print("Connected to WiFi (");
+        Serial.print(WIFI_SSID);
+        Serial.println(")");
+        Serial.print("IP: ");
+        Serial.println(WiFi.localIP());
         update_ota.begin();
     };
     
@@ -100,7 +108,7 @@ void setup() {
         Serial.println("Already up to date");
     };
 
-    //mqtt.begin("10.1.0.10",client_id,"esp8266","esp8266");
+    //mqtt.begin(MQTT_HOST,client_id,MQTT_USER,MQTT_PASS);
     mqtt.on_connected=[&]
     {
         Serial.println("Connected to MQTT");
