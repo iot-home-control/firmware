@@ -34,7 +34,7 @@ mqtt_handler mqtt;
 
 rotary_encoder encoder;
 led_strip leds(62);
-//led_strip leds(15);
+//led_strip leds(37);
 
 float ticks_per_second=30.0f;
 unsigned long cycle_time_ms=(int)(1000/ticks_per_second);
@@ -142,7 +142,7 @@ void setup() {
         Serial.println("Already up to date");
     };
 
-    //mqtt.begin(MQTT_HOST,client_id,MQTT_USER,MQTT_PASS);
+    mqtt.begin(MQTT_HOST,client_id,MQTT_USER,MQTT_PASS);
     mqtt.on_connected=[&]
     {
         Serial.println("Connected to MQTT");
@@ -231,6 +231,7 @@ void setup() {
             preset_index=clamp(0u,preset_num,ARRAY_COUNT(presets_hsl)-1);
             apply_preset();
         }
+   
 
     };
 
@@ -335,7 +336,7 @@ void setup() {
 
     components.push_back(&encoder);
     //leds.fade_to_color(colors[preset_index], 1000);
-    leds.turn_on(get_current_color(), 500);
+    //leds.turn_on(get_current_color(), 500);
     //apply_preset();
 }
 void loop() {
