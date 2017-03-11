@@ -8,7 +8,7 @@
 
 set -e
 
-TOOL_ROOT="/home/trilader/code/esp8266-sdk/tools"
+TOOL_ROOT="../../esp8266-sdk/tools"
 ESP_TOOL="$TOOL_ROOT/esptool/esptool"
 OTA_TOOL="$TOOL_ROOT/espota.py"
 
@@ -24,6 +24,8 @@ if [ "$#" -lt 1 ]; then
 fi
 
 FILE="build/$1.bin"
+
+echo "File: $FILE \n"
 
 if [ ! -e "$FILE" ]; then
     usage
@@ -46,6 +48,7 @@ elif [ "$1" == "ota" ]; then
         ARGS="$ARGS -p 8266"
     fi
     python $OTA_TOOL -d -i $(avahi-resolve-host-name -4 "${1}.local" | cut -f2) $ARGS -f "$FILE"
+#    python $OTA_TOOL -d -i 10.42.0.197 $ARGS -f "$FILE"
 else
     usage
 fi
