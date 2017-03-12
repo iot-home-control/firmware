@@ -12,4 +12,6 @@
 #define MQTT_USER "username"
 #define MQTT_PASS "password"
 
+#define LED_STRIP_LENGTH 9999
+
 #endif // CONFIG_H

@@ -33,8 +33,8 @@ mqtt_handler mqtt;
 periodic_message_poster message_poster;
 
 rotary_encoder encoder;
-led_strip leds(62);
-//led_strip leds(37);
+led_strip leds(LED_STRIP_LENGTH);
+
 
 float ticks_per_second=30.0f;
 unsigned long cycle_time_ms=(int)(1000/ticks_per_second);
