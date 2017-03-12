@@ -29,8 +29,8 @@
 String client_id;
 wifi_connector wifi_con;
 updater_ota update_ota;
-updater_http update_http;
 mqtt_handler mqtt;
+periodic_message_poster message_poster;
 
 rotary_encoder encoder;
 led_strip leds(62);
@@ -180,6 +180,8 @@ void setup() {
         Serial.println(v);
     };
 */
+    message_poster.begin(&mqtt, "/alive", client_id, 60000);
+    components.push_back(&message_poster);
 
     auto led_action_msg_handler=[&](char* topic, unsigned char* data, unsigned int length)
     {
@@ -235,8 +237,8 @@ void setup() {
 
     };
 
+    mqtt.handle_topic("/leds/client_id/action", led_action_msg_handler);
     mqtt.handle_topic("/leds/action", led_action_msg_handler);
-
     auto led_color_msg_handler=[&](char* topic, unsigned char* data, unsigned int length)
     {
         char s[length+1];
@@ -285,6 +287,7 @@ void setup() {
     };
 
     mqtt.handle_topic("/leds/color/rgb", led_color_msg_handler);
+    mqtt.handle_topic("/leds/client_id/color/rgb", led_color_msg_handler);
 
     encoder.begin(5,4,0);
     encoder.on_encoder_changed([&](int delta)

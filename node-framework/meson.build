@@ -25,7 +25,7 @@ deps_led_strip = [
     RotaryEncoder.get_variable('lib')
 ]
 
-led_strip_exe = executable('led_strip.elf', ['led_strip.cpp', 'gpio_pin.cpp', 'mqtt_handler.cpp', 'sensor_dht22.cpp', 'node_led_strip.cpp', 'updater_http.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'rotary_encoder.cpp', 'button.cpp', 'trampoline_magic.cpp'], dependencies: deps_led_strip)
+led_strip_exe = executable('led_strip.elf', ['led_strip.cpp', 'gpio_pin.cpp', 'mqtt_handler.cpp', 'sensor_dht22.cpp', 'node_led_strip.cpp', 'updater_http.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'rotary_encoder.cpp', 'button.cpp', 'trampoline_magic.cpp', 'periodic_message_poster.cpp'], dependencies: deps_led_strip)
 
 led_strip_bin = custom_target('led_stip.bin',
   input : led_strip_exe,
@@ -45,7 +45,7 @@ deps_temperature_sensor = [
     ArduinoTemperatureControlLibrary.get_variable('lib')
 ]
 
-temperature_sensor_exe = executable('temperature_sensor.elf', ['node_temperature_sensor.cpp', 'sensor_dht22.cpp', 'mqtt_handler.cpp', 'updater_ota.cpp', 'wifi_connector.cpp'], dependencies: deps_temperature_sensor)
+temperature_sensor_exe = executable('temperature_sensor.elf', ['node_temperature_sensor.cpp', 'sensor_dht22.cpp', 'mqtt_handler.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'periodic_message_poster.cpp'], dependencies: deps_temperature_sensor)
 
 temperature_sensor_bin = custom_target('temperature_sensor.bin',
   input : temperature_sensor_exe,
@@ -63,7 +63,7 @@ deps_power_switch = [
     PubSubClient.get_variable('lib')
 ]
 
-power_switch_exe = executable('power_switch.elf', ['node_power_switch.cpp', 'mqtt_handler.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'button.cpp', 'gpio_pin.cpp', 'trampoline_magic.cpp'], dependencies: deps_power_switch)
+power_switch_exe = executable('power_switch.elf', ['node_power_switch.cpp', 'mqtt_handler.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'button.cpp', 'gpio_pin.cpp', 'trampoline_magic.cpp', 'periodic_message_poster.cpp'], dependencies: deps_power_switch)
 
 power_switch_bin = custom_target('power_switch.bin',
   input : power_switch_exe,

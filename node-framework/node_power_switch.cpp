@@ -18,6 +18,7 @@
 
 //#include "sensor_dht22.h"
 #include "gpio_pin.h"
+#include "periodic_message_poster.h"
 //#include "led_strip.h"
 //#include "rotary_encoder.h"
 #include "button.h"
@@ -32,11 +33,14 @@ wifi_connector wifi_con;
 updater_ota update_ota;
 //updater_http update_http;
 mqtt_handler mqtt;
+periodic_message_poster message_poster;
 
 button btn;
 
 gpio_pin pin_relay;
 gpio_pin pin_led;
+
+bool switch_state=false;
 
 
 float ticks_per_second=30.0f;
@@ -47,12 +51,15 @@ std::vector<ticker_component*> components;
 void switch_relay_on() {
     pin_relay.write(HIGH);
     pin_led.write(LOW);
+    switch_state = true;
 }
 
 void switch_relay_off() {
     pin_relay.write(LOW);
     pin_led.write(HIGH);
+    switch_state = false;
 }
+
  
 bool state=false;
 
@@ -129,6 +136,8 @@ void setup() {
         Serial.println("'");
     };
     
+    message_poster.begin(&mqtt, "/alive", client_id, 60000);
+    components.push_back(&message_poster);
     
     pin_relay.begin(5, gpio_pin::pin_out);
     components.push_back(&pin_relay);
@@ -167,11 +176,13 @@ void setup() {
         if(data_str=="on")
         {
             Serial.println("[MQTT] Turning on.");
+            mqtt.publish("/switch/"+client_id+"/state","mqtt,on");
             switch_relay_on();
         }
         else if(data_str=="off")
         {
             Serial.println("[MQTT] Turning off.");
+            mqtt.publish("/switch/"+client_id+"/state","mqtt,off");
             switch_relay_off();
         }
     };
@@ -179,17 +190,20 @@ void setup() {
   
 
     mqtt.handle_topic("/switch/action", switch_action_msg_handler);
+    mqtt.handle_topic("/switch/"+client_id+"/action", switch_action_msg_handler);
     
     
     btn.on_short_click([&]
     {
         if(state) {
             Serial.println("Switch off the relay");
+            mqtt.publish("/switch/"+client_id+"/state","local,off");
             switch_relay_off();
             
         }
         else {
             Serial.println("Switch on the relay");
+            mqtt.publish("/switch/"+client_id+"/state","local,on");
             switch_relay_on();
         }
         state = !state;
