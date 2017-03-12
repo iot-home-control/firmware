@@ -13,11 +13,11 @@
 #include "config.h"
 #include "wifi_connector.h"
 #include "updater_ota.h"
-#include "updater_http.h"
 #include "mqtt_handler.h"
 
 #include "sensor_dht22.h"
 #include "gpio_pin.h"
+#include "periodic_message_poster.h"
 #include "led_strip.h"
 #include "rotary_encoder.h"
 #include "util.h"
@@ -128,20 +128,6 @@ void setup() {
     update_ota.set_password(OTA_PASS);
     update_ota.set_hostname("led-strip");
     
-    update_http.on_update_ok=[]
-    {
-        Serial.println("Ok. Rebooting.");
-    };
-    update_http.on_update_error=[](const String& error_msg)
-    {
-        Serial.print("Error: ");
-        Serial.println(error_msg);
-    };
-    update_http.on_update_up_to_date=[]
-    {
-        Serial.println("Already up to date");
-    };
-
     mqtt.begin(MQTT_HOST,client_id,MQTT_USER,MQTT_PASS);
     mqtt.on_connected=[&]
     {
