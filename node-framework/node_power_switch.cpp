@@ -31,7 +31,6 @@
 String client_id;
 wifi_connector wifi_con;
 updater_ota update_ota;
-//updater_http update_http;
 mqtt_handler mqtt;
 periodic_message_poster message_poster;
 
