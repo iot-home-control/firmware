@@ -6,11 +6,18 @@ led_strip::led_strip(size_t length): animator(length, NEO_MILLISECONDS), strip_l
 {
 }
 
+void do_show(led_type& leds)
+{
+    pinMode(2, FUNCTION_2);
+    delay(1);
+    leds.Show();
+}
+
 void led_strip::begin()
 {
     leds.Begin();
     leds.ClearTo(RgbColor(0,0,0));
-    leds.Show();
+    do_show(leds);
     _is_on=false;
 }
 
@@ -19,7 +26,7 @@ void led_strip::update()
     if(animator.IsAnimating())
     {
         animator.UpdateAnimations();
-        leds.Show();
+        do_show(leds);
     }
     else
     {
@@ -46,6 +53,11 @@ void led_strip::update()
                 animation_playing=true;
             }
         }
+    }
+    
+    if(leds.CanShow()) {
+        pinMode(2, OUTPUT);
+        digitalWrite(2, HIGH);
     }
 }
 
@@ -79,7 +91,7 @@ void led_strip::fade_to_color(const HslColor &color, size_t fade_duration_ms)
 void led_strip::set_color_to(const HslColor &color)
 {
     leds.ClearTo(color);
-    leds.Show();
+    do_show(leds);
 }
 
 void led_strip::turn_on(const HslColor &color, size_t fade_duration_ms)
@@ -90,13 +102,13 @@ void led_strip::turn_on(const HslColor &color, size_t fade_duration_ms)
         HslColor off_color=color;
         off_color.L=0;
         leds.ClearTo(off_color);
-        leds.Show();
+        do_show(leds);
         fade_to_color(color, fade_duration_ms);
     }
     else
     {
         leds.ClearTo(color);
-        leds.Show();
+        do_show(leds);
     }
 }
 
