@@ -35,7 +35,6 @@ periodic_message_poster message_poster;
 rotary_encoder encoder;
 led_strip leds(LED_STRIP_LENGTH);
 
-
 float ticks_per_second=30.0f;
 unsigned long cycle_time_ms=(int)(1000/ticks_per_second);
 
@@ -180,11 +179,13 @@ void setup() {
         {
             Serial.println("[MQTT] Turning on.");
             leds.turn_on(get_current_color(),500);
+            mqtt.publish("/leds/"+client_id+"/state","mqtt,on");
         }
         else if(data_str=="off")
         {
             Serial.println("[MQTT] Turning off.");
             leds.turn_off(500);
+            mqtt.publish("/leds/"+client_id+"/state","mqtt,off");
         }
         else if(data_str=="sunrise")
         {
@@ -223,7 +224,7 @@ void setup() {
 
     };
 
-    mqtt.handle_topic("/leds/client_id/action", led_action_msg_handler);
+    mqtt.handle_topic("/leds/"+client_id+"/action", led_action_msg_handler);
     mqtt.handle_topic("/leds/action", led_action_msg_handler);
     auto led_color_msg_handler=[&](char* topic, unsigned char* data, unsigned int length)
     {
@@ -273,7 +274,7 @@ void setup() {
     };
 
     mqtt.handle_topic("/leds/color/rgb", led_color_msg_handler);
-    mqtt.handle_topic("/leds/client_id/color/rgb", led_color_msg_handler);
+    mqtt.handle_topic("/leds/"+client_id+"/color/rgb", led_color_msg_handler);
 
     encoder.begin(5,4,0);
     encoder.on_encoder_changed([&](int delta)
@@ -304,11 +305,13 @@ void setup() {
         {
             Serial.println("Turning off.");
             leds.turn_off(500);
+            mqtt.publish("/leds/"+client_id+"/state","local,off");
         }
         else
         {
             Serial.println("Turning on.");
             leds.turn_on(get_current_color(),500);
+            mqtt.publish("/leds/"+client_id+"/state","local,on");
         }
         state=!state;
     });
@@ -325,8 +328,12 @@ void setup() {
 
     components.push_back(&encoder);
     //leds.fade_to_color(colors[preset_index], 1000);
-    //leds.turn_on(get_current_color(), 500);
+#if defined(LED_STRIP_ENABLE_ON_BOOT)
+    leds.turn_on(get_current_color(), 500);
+#endif
     //apply_preset();
+    
+    
 }
 void loop() {
     unsigned long start_ms=millis();
