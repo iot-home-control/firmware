@@ -3,3 +3,4 @@ config.h
 build*/
 *.pro.user
 *.log
+*.pro
