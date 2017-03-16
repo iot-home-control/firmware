@@ -1,6 +1,11 @@
 // kate: hl C++;
 // vim: filetype=c++: 
 
+/* Get state_topic, get action_topic mit type
+ * 
+ */
+
+
 #include <Arduino.h>
 
 #include <ArduinoOTA.h>

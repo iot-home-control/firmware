@@ -63,7 +63,7 @@ deps_power_switch = [
     PubSubClient.get_variable('lib')
 ]
 
-power_switch_exe = executable('power_switch.elf', ['node_power_switch.cpp', 'mqtt_handler.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'button.cpp', 'gpio_pin.cpp', 'trampoline_magic.cpp', 'periodic_message_poster.cpp'], dependencies: deps_power_switch)
+power_switch_exe = executable('power_switch.elf', ['node_base.cpp', 'node_power_switch.cpp', 'mqtt_handler.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'button.cpp', 'gpio_pin.cpp', 'trampoline_magic.cpp', 'periodic_message_poster.cpp'], dependencies: deps_power_switch)
 
 power_switch_bin = custom_target('power_switch.bin',
   input : power_switch_exe,
