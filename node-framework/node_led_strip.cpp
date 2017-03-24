@@ -131,7 +131,7 @@ void setup() {
     mqtt.on_connected=[&]
     {
         Serial.println("Connected to MQTT");
-        mqtt.publish("/switch/"+client_id+"/state","local,reboot");
+        mqtt.publish("/leds/"+client_id+"/state","local,reboot");
     };
     mqtt.on_disconnected=[&]
     {
