@@ -76,9 +76,18 @@ String node_base::get_state_topic(const String &type)
     return "/"+type+"/"+device_id+"/state";
 }
 
-String node_base::get_action_topic(const String &type)
+String node_base::get_action_topic(const String &type, const String &alt_suffix)
 {
-    return "/"+type+"/"+device_id+"/action";
+    String base = "/"+type+"/"+device_id;
+    if(alt_suffix=="")
+    {
+        return base+"/action";
+    }
+    else
+    {
+        return base+"/"+alt_suffix;
+    }
+
 }
 
 void node_base::on_wifi_connected()
