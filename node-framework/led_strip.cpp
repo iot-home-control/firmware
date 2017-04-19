@@ -4,6 +4,7 @@
 led_strip::led_strip(size_t length): animator(length, NEO_MILLISECONDS), strip_length(length),
     animation_playing(false), repeat_animation(false), current_animation_setup(nullptr), leds(length,3)
 {
+    hslStrip.resize(length, HslColor(0,0,0));
 }
 
 void do_show(led_type& leds)
@@ -16,7 +17,7 @@ void do_show(led_type& leds)
 void led_strip::begin()
 {
     leds.Begin();
-    leds.ClearTo(RgbColor(0,0,0));
+    leds.ClearTo(LedOffColor);
     do_show(leds);
     _is_on=false;
 }
@@ -70,18 +71,16 @@ void led_strip::fade_to_color(const HslColor &color, size_t fade_duration_ms)
 {
     for (uint16_t pixel_index=0;pixel_index<strip_length;pixel_index++)
     {
-        HslColor color_start=leds.GetPixelColor(pixel_index);
+        HslColor color_start=HslColor(hslStrip[pixel_index]);
         AnimUpdateCallback cb_update=[=](AnimationParam param) mutable
         {
             // progress will start at 0.0 and end at 1.0
-            auto set_color = //gamma.Correct(
-                        RgbColor(
-                            HslColor::LinearBlend<NeoHueBlendShortestDistance>(
-                                color_start,
-                                color,
-                                param.progress)
-                          //  )
-                        );
+            auto ledHsl = HslColor::LinearBlend<NeoHueBlendShortestDistance>(
+                        color_start,
+                        color,
+                        param.progress);
+            auto set_color = LedColorType(ledHsl);
+            hslStrip[pixel_index]=ledHsl;
             leds.SetPixelColor(pixel_index, set_color);
         };
         animator.StartAnimation(pixel_index,fade_duration_ms,cb_update);
@@ -117,20 +116,18 @@ void led_strip::turn_off(size_t fade_duration_ms)
     _is_on=false;
     for (uint16_t pixel_index=0;pixel_index<strip_length;pixel_index++)
     {
-        HslColor color_start=leds.GetPixelColor(pixel_index);
+        HslColor color_start=HslColor(hslStrip[pixel_index]);
         HslColor color_stop=color_start;
         color_stop.L=0;
         AnimUpdateCallback cb_update=[=](AnimationParam param)
         {
             // progress will start at 0.0 and end at 1.0
-            auto set_color = //gamma.Correct(
-                        RgbColor(
-                            HslColor::LinearBlend<NeoHueBlendShortestDistance>(
-                                color_start,
-                                color_stop,
-                                param.progress)
-                            //)
-                        );
+            auto hslColor = HslColor::LinearBlend<NeoHueBlendShortestDistance>(
+                        color_start,
+                        color_stop,
+                        param.progress);
+            auto set_color = LedColorType(hslColor);
+            hslStrip[pixel_index]=hslColor;
             leds.SetPixelColor(pixel_index, set_color);
         };
         animator.StartAnimation(pixel_index,fade_duration_ms,cb_update);
@@ -157,6 +154,7 @@ void led_strip::play_animation_rainbow(uint16_t duration_ms, bool repeat)
                     h_new-=1.0;
                 }
                 HslColor color_new(h_new, color_start.S, color_start.L);
+                hslStrip[pixel_index]=color_new;
                 leds.SetPixelColor(pixel_index, color_new);
             };
             animator.StartAnimation(pixel_index,duration_ms,cb_update);
@@ -518,11 +516,13 @@ void led_strip::play_animation_warp_core(HslColor color, uint16_t duration_ms, b
                     bool on=(progress/bump_start_percent)>p;
                     if(on)
                     {
+                        hslStrip[pixel_index]=color;
                         leds.SetPixelColor(pixel_index, color);
                     }
                     else
                     {
-                        leds.SetPixelColor(pixel_index, RgbColor(0,0,0));
+                        hslStrip[pixel_index]=HslColor(0,0,0);
+                        leds.SetPixelColor(pixel_index, LedOffColor);
                     }
                 }
                 else if(progress>bump_start_percent && progress <=bump_stop_percent)
@@ -547,6 +547,7 @@ void led_strip::play_animation_warp_core(HslColor color, uint16_t duration_ms, b
                         bump_color=bump_color_high;
                         bump_color.L/=(local_percent*1.5);
                     }
+                    hslStrip[pixel_index]=bump_color;
                     leds.SetPixelColor(pixel_index, bump_color);
                 }
                 else //bump_stop_percent
@@ -554,10 +555,12 @@ void led_strip::play_animation_warp_core(HslColor color, uint16_t duration_ms, b
                     bool off=((progress-bump_stop_percent)/bump_start_percent)>p;
                     if(off)
                     {
-                        leds.SetPixelColor(pixel_index, RgbColor(0,0,0));
+                        hslStrip[pixel_index]=HslColor(0,0,0);
+                        leds.SetPixelColor(pixel_index, LedOffColor);
                     }
                     else
                     {
+                        hslStrip[pixel_index]=color;
                         leds.SetPixelColor(pixel_index, color);
                     }
                 }

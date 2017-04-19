@@ -1,11 +1,25 @@
 #pragma once
 
+#include "config.h"
 #include "NeoPixelBus.h"
 #include "NeoPixelAnimator.h"
 #include "ticker_component.h"
 #include <memory>
+#include <vector>
 
-typedef NeoPixelBus<NeoGrbFeature, NeoEsp8266Uart800KbpsMethod> led_type;
+#if defined(LEDS_RGB)
+    #define LedFeatureType NeoGbrFeature
+    #define LedColorType RgbColor
+    #define LedOffColor RgbColor(0,0,0)
+#elif defined(LEDS_RGBW)
+    #define LedFeatureType NeoGrbwFeature
+    #define LedColorType RgbwColor
+    #define LedOffColor RgbwColor(0,0,0,0)
+#else
+    #error "No LED type"
+#endif
+
+typedef NeoPixelBus<LedFeatureType, NeoEsp8266Uart800KbpsMethod> led_type;
 
 class led_strip: public ticker_component
 {
@@ -14,6 +28,7 @@ private:
     NeoGamma<NeoGammaTableMethod> gamma;
     size_t strip_length;
     bool _is_on=false;
+    std::vector<HslColor> hslStrip;
 
     // Animation stuff
     //animation* current_animation;

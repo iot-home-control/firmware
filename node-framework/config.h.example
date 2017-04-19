@@ -12,6 +12,7 @@
 #define MQTT_USER "username"
 #define MQTT_PASS "password"
 
+#define LEDS_RGB // LEDS_RGBW
 #define LED_STRIP_LENGTH 9999
 #define LED_STRIP_ENABLE_ON_BOOT
 
