@@ -116,7 +116,6 @@ void node_power_switch::handle_button()
         mqtt.publish(get_state_topic("switch"),"local,on");
         switch_power(true);
     }
-    state = !state;
 }
 
 //mqtt.publish("/switch/"+client_id+"/state","local,reboot");
