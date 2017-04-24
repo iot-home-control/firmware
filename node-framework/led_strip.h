@@ -8,7 +8,7 @@
 #include <vector>
 
 #if defined(LEDS_RGB)
-    #define LedFeatureType NeoGbrFeature
+    #define LedFeatureType NeoGrbFeature
     #define LedColorType RgbColor
     #define LedOffColor RgbColor(0,0,0)
 #elif defined(LEDS_RGBW)
