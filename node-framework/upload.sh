@@ -47,7 +47,8 @@ elif [ "$1" == "ota" ]; then
     else
         ARGS="$ARGS -p 8266"
     fi
-    python $OTA_TOOL -d -i $(avahi-resolve-host-name -4 "${1}.local" | cut -f2) $ARGS -f "$FILE"
+#    python $OTA_TOOL -d -i $(avahi-resolve-host-name -4 "${1}.local" | cut -f2) $ARGS -f "$FILE"
+     python $OTA_TOOL -d -i $(dig +short ${1})  $ARGS -f "$FILE"
 #    python $OTA_TOOL -d -i 10.42.0.197 $ARGS -f "$FILE"
 else
     usage
