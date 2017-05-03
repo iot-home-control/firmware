@@ -1,6 +1,14 @@
 #include "led_strip.h"
 #include "util.h"
 
+void led_strip::set_timescale(led_strip::anim_duration duration)
+{
+    if(duration==anim_duration::anim_long)
+        animator.setTimeScale(NEO_CENTISECONDS);
+    else
+        animator.setTimeScale(NEO_MILLISECONDS);
+}
+
 led_strip::led_strip(size_t length): animator(length, NEO_MILLISECONDS), strip_length(length),
     animation_playing(false), repeat_animation(false), current_animation_setup(nullptr), leds(length,3)
 {
@@ -55,7 +63,7 @@ void led_strip::update()
             }
         }
     }
-    
+
     if(leds.CanShow()) {
         pinMode(2, OUTPUT);
         digitalWrite(2, HIGH);
@@ -69,6 +77,7 @@ bool led_strip::is_on() const
 
 void led_strip::fade_to_color(const HslColor &color, size_t fade_duration_ms)
 {
+    set_timescale(anim_duration::anim_short);
     for (uint16_t pixel_index=0;pixel_index<strip_length;pixel_index++)
     {
         HslColor color_start=HslColor(hslStrip[pixel_index]);
@@ -113,6 +122,7 @@ void led_strip::turn_on(const HslColor &color, size_t fade_duration_ms)
 
 void led_strip::turn_off(size_t fade_duration_ms)
 {
+    set_timescale(anim_duration::anim_short);
     _is_on=false;
     for (uint16_t pixel_index=0;pixel_index<strip_length;pixel_index++)
     {
@@ -134,9 +144,10 @@ void led_strip::turn_off(size_t fade_duration_ms)
     }
 }
 
-void led_strip::play_animation_rainbow(uint16_t duration_ms, bool repeat)
+void led_strip::play_animation_rainbow(uint16_t duration, anim_duration d, bool repeat)
 {
-    current_animation_setup=[this,duration_ms]
+    set_timescale(d);
+    current_animation_setup=[this,duration,d]
     {
         for (uint16_t pixel_index=0;pixel_index<strip_length;pixel_index++)
         {
@@ -157,14 +168,14 @@ void led_strip::play_animation_rainbow(uint16_t duration_ms, bool repeat)
                 hslStrip[pixel_index]=color_new;
                 leds.SetPixelColor(pixel_index, color_new);
             };
-            animator.StartAnimation(pixel_index,duration_ms,cb_update);
+            animator.StartAnimation(pixel_index,duration,cb_update);
         }
     };
     animation_playing=false;
     repeat_animation=repeat;
 }
 
-RgbColor sunrise_colors[]=
+static const RgbColor sunrise_colors[]=
 {
     {0, 0, 0},
     {8, 0, 0},
@@ -469,9 +480,10 @@ RgbColor sunrise_colors[]=
 };
 
 
-void led_strip::play_animation_sunrise(uint16_t duration_ms)
+void led_strip::play_animation_sunrise(uint16_t duration, anim_duration d)
 {
-    current_animation_setup=[this,duration_ms]
+    set_timescale(d);
+    current_animation_setup=[this,duration]
     {
         uint16_t center_index=(strip_length-1)/2;
         float max_offset=0.33;
@@ -489,7 +501,7 @@ void led_strip::play_animation_sunrise(uint16_t duration_ms)
                 RgbColor pixel_color=sunrise_colors[(int)(progress*(ARRAY_COUNT(sunrise_colors)-1))];
                 leds.SetPixelColor(pixel_index, pixel_color);
             };
-            animator.StartAnimation(pixel_index,duration_ms,cb_update);
+            animator.StartAnimation(pixel_index,duration,cb_update);
         }
     };
     animation_playing=false;
@@ -498,6 +510,7 @@ void led_strip::play_animation_sunrise(uint16_t duration_ms)
 
 void led_strip::play_animation_warp_core(HslColor color, uint16_t duration_ms, bool repeat)
 {
+    set_timescale(anim_duration::anim_short);
     current_animation_setup=[this,duration_ms,color]
     {
         float bump_percent=0.33;

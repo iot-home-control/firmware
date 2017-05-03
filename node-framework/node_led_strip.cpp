@@ -92,7 +92,7 @@ void node_led_strip::handle_action_message(char *topic, unsigned char *data, uns
     else if(data_str=="sunrise")
     {
         Serial.println("[MQTT] Starting Sunrise");
-        leds.play_animation_sunrise(600000);
+        leds.play_animation_sunrise(3000,led_strip::anim_duration::anim_long);
     }
     else if(data_str=="warp_start")
     {
@@ -107,12 +107,12 @@ void node_led_strip::handle_action_message(char *topic, unsigned char *data, uns
     else if(data_str=="rainbow_start")
     {
         Serial.println("[MQTT] Starting rainbow");
-        leds.play_animation_rainbow(2500, true);
+        leds.play_animation_rainbow(2500,led_strip::anim_duration::anim_short, true);
     }
     else if(data_str=="rainbow_stop")
     {
         Serial.println("[MQTT] Starting rainbow");
-        leds.play_animation_rainbow(2500, false);
+        leds.play_animation_rainbow(2500, led_strip::anim_duration::anim_short, false);
     }
     else if(data_str.startsWith("preset="))
     {

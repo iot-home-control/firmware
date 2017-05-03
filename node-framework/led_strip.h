@@ -23,6 +23,9 @@ typedef NeoPixelBus<LedFeatureType, NeoEsp8266Uart800KbpsMethod> led_type;
 
 class led_strip: public ticker_component
 {
+public:
+    enum class anim_duration{anim_long, anim_short};
+
 private:
     NeoPixelAnimator animator;
     NeoGamma<NeoGammaTableMethod> gamma;
@@ -35,6 +38,8 @@ private:
     bool animation_playing;
     bool repeat_animation;
     std::function<void(void)> current_animation_setup;
+
+    void set_timescale(anim_duration duration);
 
 public:
     led_type leds;
@@ -50,12 +55,10 @@ public:
     void turn_on(const HslColor& color, size_t fade_duration_ms=0);
     void turn_off(size_t fade_duration_ms=0);
 
-    void play_animation_rainbow(uint16_t duration_ms, bool repeat=true);
-    void play_animation_sunrise(uint16_t duration_ms);
+    void play_animation_rainbow(uint16_t duration, anim_duration d, bool repeat=true);
+    void play_animation_sunrise(uint16_t duration, anim_duration d);
     void play_animation_warp_core(HslColor color, uint16_t duration_ms, bool repeat=true);
 
     void stop_animation();
     bool is_playing_animation();
-
-
 };
