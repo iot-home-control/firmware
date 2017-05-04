@@ -64,14 +64,14 @@ void node_base::wait_for_loop_timing()
         delay(cycle_time_ms-used_ms);
 }
 
-String node_base::get_state_topic(const String &type)
+String node_base::get_state_topic(const String &type, const int vnode)
 {
-    return "/"+type+"/"+device_id+"/state";
+    return "/"+type+"/"+device_id+"-"+vnode+"/state";
 }
 
-String node_base::get_action_topic(const String &type, const String &alt_suffix)
+String node_base::get_action_topic(const String &type, const int vnode, const String &alt_suffix)
 {
-    String base = "/"+type+"/"+device_id;
+    String base = "/"+type+"/"+device_id+"-"+vnode;
     if(alt_suffix=="")
     {
         return base+"/action";

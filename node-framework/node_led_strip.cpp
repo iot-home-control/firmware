@@ -193,7 +193,7 @@ void node_led_strip::setup() {
     mqtt.handle_topic("/leds/action", led_action_handler);
 
     mqtt.handle_topic("/leds/color/rgb", led_color_handler);
-    mqtt.handle_topic(get_action_topic("leds", "color/rgb"), led_color_handler);
+    mqtt.handle_topic(get_action_topic("leds", 0, "color/rgb"), led_color_handler);
 
     encoder.begin(5,4,0);
     encoder.on_encoder_changed([&](int delta)

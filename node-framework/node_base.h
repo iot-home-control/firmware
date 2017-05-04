@@ -25,8 +25,8 @@ public:
     virtual void setup();
     virtual void loop();
     void wait_for_loop_timing();
-    String get_state_topic(const String& type);
-    String get_action_topic(const String& type, const String& alt_suffix="");
+    String get_state_topic(const String& type, const int vnode=0);
+    String get_action_topic(const String& type, const int vnode=0, const String& alt_suffix="");
 
 protected:
     String device_id;
