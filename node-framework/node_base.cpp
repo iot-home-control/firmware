@@ -33,15 +33,8 @@ void node_base::setup() {
     Serial.println(device_id);
 
     wifi.begin(WIFI_SSID, WIFI_PASS);
-    wifi.on_connected=[&]
-    {
-        Serial.print("Connected to WiFi (");
-        Serial.print(WIFI_SSID);
-        Serial.println(")");
-        Serial.print("IP: ");
-        Serial.println(WiFi.localIP());
-        ota.begin();
-    };
+    wifi.on_connected=std::bind(&node_base::on_wifi_connected, this);
+    wifi.on_disconnected=std::bind(&node_base::on_wifi_disconnected, this);
 
     ota.set_password(OTA_PASS);
 
@@ -92,21 +85,26 @@ String node_base::get_action_topic(const String &type, const String &alt_suffix)
 
 void node_base::on_wifi_connected()
 {
-    Serial.println("Connected to MQTT");
+    Serial.print("WiFi Connected (");
+    Serial.print(WIFI_SSID);
+    Serial.println(")");
+    Serial.print("IP: ");
+    Serial.println(WiFi.localIP());
+    ota.begin();
 }
 
 void node_base::on_wifi_disconnected()
 {
-    Serial.println("Disconnected from MQTT");
+    Serial.println("WiFi Disconnected");
 }
 
 void node_base::on_mqtt_connected()
 {
-
+    Serial.println("MQTT Connected");
 }
 
 void node_base::on_mqtt_disconnected()
 {
-
+    Serial.println("MQTT Disconnected");
 }
 
