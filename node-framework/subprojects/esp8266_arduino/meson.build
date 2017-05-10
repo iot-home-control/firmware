@@ -1,5 +1,7 @@
 project('esp8266_arduino', 'cpp')
 
+add_project_arguments('-Wno-unused-variable', '-Wno-parentheses', language: 'cpp')
+
 esp8266_base = meson.get_cross_property('esp8266_base')
 
 sdk=subproject('esp8266_sdk')

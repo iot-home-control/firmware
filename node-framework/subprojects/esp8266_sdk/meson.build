@@ -1,5 +1,7 @@
 project('esp8266_sdk', ['c', 'cpp'])
 
+add_project_arguments('-Wno-unused-function', language: 'cpp')
+
 esp8266_base = meson.get_cross_property('esp8266_base')
 esptool = find_program(meson.get_cross_property('esptool'))
 
