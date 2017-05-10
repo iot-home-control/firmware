@@ -5,8 +5,8 @@
 #define spl Serial.println
 #define sp Serial.println
 #else
-#define spl
-#define sp
+#define spl(...)
+#define sp(...)
 #endif
 
 int get_retry_delay(int retry_count, int retry_interval)
@@ -86,7 +86,7 @@ void mqtt_handler::update()
             client.connect(mqtt_id.c_str(), mqtt_user.c_str(), mqtt_pass.c_str());
             spl("!connecting stop");
         }
-        else if(now-connecting_start_time>get_retry_delay(connection_retry_count, connection_retry_interval))
+        else if(now-connecting_start_time>(unsigned)get_retry_delay(connection_retry_count, connection_retry_interval))
         {
             connection_retry_count++;
             // retry
