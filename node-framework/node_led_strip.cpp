@@ -211,7 +211,7 @@ void node_led_strip::setup() {
             leds.stop_animation();
             return;
         }
-        preset_index=++preset_index%(ARRAY_COUNT(presets_hsl)-1);
+        preset_index=(preset_index+1)%(ARRAY_COUNT(presets_hsl)-1);
         //leds.fade_to_color(presets_hsl[preset_index], 500);
         apply_preset();
         Serial.print("Preset:");
