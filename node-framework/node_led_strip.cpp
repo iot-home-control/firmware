@@ -140,7 +140,7 @@ void node_led_strip::handle_color_message(char *topic, unsigned char *data, unsi
         size_t last_comma=0;
         while(color<3)
         {
-            size_t comma = data_str.indexOf(',', last_comma);
+            int comma = data_str.indexOf(',', last_comma);
             Serial.print("found comma at ");
             Serial.println(comma);
             if(comma!=-1)
