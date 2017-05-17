@@ -20,7 +20,7 @@ private:
     
     float last_temperature, last_humidity;
 public:
-    typedef std::function<void(float)> callback;
+    typedef std::function<void(const float)> callback;
     
     sensor_dht22();
     void begin(unsigned char pin, unsigned long update_every_ms);
