@@ -32,7 +32,8 @@ led_strip_exe = executable('led_strip.elf', ['node_base.cpp', 'led_strip.cpp', '
 led_strip_bin = custom_target('led_stip.bin',
   input : led_strip_exe,
   output : 'led_strip.bin',
-  command : sdk.get_variable('esptoolize')
+  command : sdk.get_variable('esptoolize'),
+  build_by_default: true,
 )
 
 deps_temperature_sensor = [
@@ -52,7 +53,8 @@ temperature_sensor_exe = executable('temperature_sensor.elf', ['node_temperature
 temperature_sensor_bin = custom_target('temperature_sensor.bin',
   input : temperature_sensor_exe,
   output : 'temperature_sensor.bin',
-  command : sdk.get_variable('esptoolize')
+  command : sdk.get_variable('esptoolize'),
+  build_by_default: true,
 )
 
 
@@ -70,5 +72,6 @@ power_switch_exe = executable('power_switch.elf', ['node_base.cpp', 'node_power_
 power_switch_bin = custom_target('power_switch.bin',
   input : power_switch_exe,
   output : 'power_switch.bin',
-  command : sdk.get_variable('esptoolize')
+  command : sdk.get_variable('esptoolize'),
+  build_by_default: true,
 )
