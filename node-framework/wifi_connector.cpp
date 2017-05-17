@@ -11,6 +11,7 @@ void wifi_connector::begin(const String& ssid, const String& password)
     this->ssid=ssid;
     this->password=password;
     connecting=true;
+    WiFi.hostname("esp8266-"+String(ESP.getChipId(), HEX));
     WiFi.begin(this->ssid.c_str(), this->password.c_str());
 }
 
