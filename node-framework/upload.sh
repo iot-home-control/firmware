@@ -25,7 +25,7 @@ fi
 
 FILE="build/$1.bin"
 
-echo "File: $FILE \n"
+echo "Uploading file: $FILE"
 
 if [ ! -e "$FILE" ]; then
     usage
