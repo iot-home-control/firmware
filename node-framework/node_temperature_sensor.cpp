@@ -6,13 +6,13 @@
 #include <DallasTemperature.h>
 #include "sensor_dht22.h"
 
-sensor_dht22 dht22;
-
 class node_temperature_sensor: public node_base
 {
 public:
     void setup() override;
     void loop() override;
+private:
+    sensor_dht22 dht22;
 };
 
 void node_temperature_sensor::setup()
