@@ -37,8 +37,8 @@ elif [ "$1" == "ota" ]; then
     HOSTNAME="$1"
 
     if [[ -n "$(which jq)" && -f "upload_aliases.json" ]]; then
-        MAYBE_HOSTNAME=$(jq --exit-status --raw-output ".${HOSTNAME}" upload_aliases.json)
-        if [[ $? == 0 ]]; then
+        MAYBE_HOSTNAME=$(jq --raw-output ".\"${HOSTNAME}\"" upload_aliases.json)
+        if [[ "$MAYBE_HOSTNAME" != "null" ]]; then
             echo "$HOSTNAME is aliased to $MAYBE_HOSTNAME"
             HOSTNAME=$MAYBE_HOSTNAME
         fi
