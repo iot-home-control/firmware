@@ -24,7 +24,7 @@ public:
     
     sensor_dht22();
     void begin(unsigned char pin, unsigned long update_every_ms);
-    void update();
+    void update() override;
     float get_temperature();
     float get_humidity();
     
