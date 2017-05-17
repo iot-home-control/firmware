@@ -48,7 +48,7 @@ deps_temperature_sensor = [
     ArduinoTemperatureControlLibrary.get_variable('lib')
 ]
 
-temperature_sensor_exe = executable('temperature_sensor.elf', ['node_base.cpp', 'node_temperature_sensor.cpp', 'sensor_dht22.cpp', 'mqtt_handler.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'periodic_message_poster.cpp'], dependencies: deps_temperature_sensor)
+temperature_sensor_exe = executable('temperature_sensor.elf', ['node_base.cpp', 'node_temperature_sensor.cpp', 'sensor_dht22.cpp', 'mqtt_handler.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'periodic_message_poster.cpp', 'sensor_ds1820.cpp'], dependencies: deps_temperature_sensor)
 
 temperature_sensor_bin = custom_target('temperature_sensor.bin',
   input : temperature_sensor_exe,

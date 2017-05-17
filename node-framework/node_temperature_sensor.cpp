@@ -3,7 +3,7 @@
 
 #include "node_base.h"
 
-#include <DallasTemperature.h>
+#include "sensor_ds1820.h"
 #include "sensor_dht22.h"
 
 class node_temperature_sensor: public node_base
@@ -13,6 +13,7 @@ public:
     void loop() override;
 private:
     sensor_dht22 dht22;
+    sensor_ds1820 ds1820;
 };
 
 void node_temperature_sensor::setup()
@@ -32,6 +33,17 @@ void node_temperature_sensor::setup()
         mqtt.publish(get_state_topic("humidity"),"local,"+String(v));
     };
     components.push_back(&dht22);
+
+    ds1820.begin(4,10000,1);
+    ds1820.on_temperature_changed=[this](const uint8_t index, const float v, const int vnode_offest)
+    {
+        Serial.print("Temperature on DS1820 #");
+        Serial.print(index);
+        Serial.print(" ");
+        Serial.println(v);
+        mqtt.publish(get_state_topic("temperature",vnode_offest+index),"local,"+String(v));
+    };
+    components.push_back(&ds1820);
 }
 
 void node_temperature_sensor::loop()

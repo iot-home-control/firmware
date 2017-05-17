@@ -16,7 +16,8 @@ HEADERS += \
     led_strip.h \
     rotary_encoder.h \
     button.h \
-    util.h
+    util.h \
+    sensor_ds1820.h
 
 SOURCES += \
     node_led_strip.cpp \
@@ -29,4 +30,5 @@ SOURCES += \
     led_strip.cpp \
     rotary_encoder.cpp \
     trampoline_magic.cpp \
-    button.cpp
+    button.cpp \
+    sensor_ds1820.cpp
