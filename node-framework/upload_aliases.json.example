@@ -1,0 +1,4 @@
+{
+    "node1": "esp8266-xxxxxx.local",
+    "node2": "esp8266-yyyyyy.my-domain.tld"
+}

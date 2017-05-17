@@ -4,3 +4,4 @@ build*/
 *.pro.user
 *.log
 *.pro
+upload_aliases.json

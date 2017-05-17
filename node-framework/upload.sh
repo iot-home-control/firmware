@@ -1,11 +1,5 @@
 #!/bin/bash
 
-#upload: all
-#	$(ESP_TOOL) $(UPLOAD_VERB) -cd $(UPLOAD_RESET) -cb $(UPLOAD_SPEED) -cp $(UPLOAD_PORT) -ca 0x00000 -cf $(MAIN_EXE)
-#
-#ota: all
-#	$(OTA_TOOL) -i $(ESP_ADDR) -p $(ESP_PORT) -a $(ESP_PWD) -f $(MAIN_EXE)
-
 set -e
 
 TOOL_ROOT="../../esp8266-sdk/tools"
@@ -40,6 +34,16 @@ if [ "$1" == "serial" ]; then
     $ESP_TOOL -cd nodemcu -cp $PORT -cb $BAUD -ca 0x0000 -cf "$FILE"
 elif [ "$1" == "ota" ]; then
     shift
+    HOSTNAME="$1"
+
+    if [[ -n "$(which jq)" && -f "upload_aliases.json" ]]; then
+        MAYBE_HOSTNAME=$(jq --exit-status --raw-output ".${HOSTNAME}" upload_aliases.json)
+        if [[ $? == 0 ]]; then
+            echo "$HOSTNAME is aliased to $MAYBE_HOSTNAME"
+            HOSTNAME=$MAYBE_HOSTNAME
+        fi
+    fi
+
     ARGS=""
     [ -n "$2" ] && ARGS="$ARGS -a $2"
     if [ "$3" == "-p" ]; then
@@ -48,7 +52,7 @@ elif [ "$1" == "ota" ]; then
         ARGS="$ARGS -p 8266"
     fi
 #    python $OTA_TOOL -d -i $(avahi-resolve-host-name -4 "${1}.local" | cut -f2) $ARGS -f "$FILE"
-     python $OTA_TOOL -d -i $(dig +short ${1})  $ARGS -f "$FILE"
+     python $OTA_TOOL -d -i $(dig +short ${HOSTNAME})  $ARGS -f "$FILE"
 #    python $OTA_TOOL -d -i 10.42.0.197 $ARGS -f "$FILE"
 else
     usage
