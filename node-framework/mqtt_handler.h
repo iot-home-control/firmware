@@ -37,7 +37,7 @@ private:
 
 public:
     mqtt_handler();
-    void begin(const String& host, const String& client_id, const String& user, const String& pass);
+    void begin(IPAddress ip, const String& client_id, const String& user, const String& pass);
     void update();
     void handle_topic(const String& name, topic_handler handler);
     void publish(const String& topic, const String& msg);

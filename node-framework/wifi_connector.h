@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <functional>
 #include "ticker_component.h"
+#include <IPAddress.h>
 
 class wifi_connector: public ticker_component
 {
@@ -22,6 +23,8 @@ public:
     
     callback on_connected;
     callback on_disconnected;
+
+    bool host_by_name(String hostname, IPAddress &ip);
 };
 
 #endif // WIFI_CONNECTOR_H

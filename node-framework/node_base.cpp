@@ -38,7 +38,12 @@ void node_base::setup() {
 
     ota.set_password(OTA_PASS);
 
-    mqtt.begin(MQTT_HOST,device_id,MQTT_USER,MQTT_PASS);
+    IPAddress mqtt_ip;
+    if(!wifi.host_by_name(MQTT_HOST, mqtt_ip)) {
+        mqtt_ip = mqtt_ip.fromString(MQTT_HOST);
+    }
+
+    mqtt.begin(mqtt_ip,device_id,MQTT_USER,MQTT_PASS);
     mqtt.on_connected=std::bind(&node_base::on_mqtt_connected, this);
     mqtt.on_disconnected=std::bind(&node_base::on_mqtt_disconnected, this);
 

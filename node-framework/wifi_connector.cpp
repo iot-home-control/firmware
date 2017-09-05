@@ -1,5 +1,6 @@
 #include "wifi_connector.h"
 #include <ESP8266WiFi.h>
+#include <IPAddress.h>
 
 wifi_connector::wifi_connector(): connecting(false), connected(false)
 {
@@ -49,4 +50,9 @@ void wifi_connector::update()
 bool wifi_connector::is_connected() const
 {
     return connected;
+}
+
+bool wifi_connector::host_by_name(String hostname, IPAddress &ip)
+{
+    return WiFi.hostByName(hostname.c_str(), ip);
 }

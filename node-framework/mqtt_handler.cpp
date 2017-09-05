@@ -46,10 +46,8 @@ mqtt_handler::mqtt_handler(): client(wifi_client), connecting(false), connected(
 {
 }
 
-void mqtt_handler::begin(const String& host, const String& client_id, const String& user, const String& pass)
+void mqtt_handler::begin(IPAddress ip, const String& client_id, const String& user, const String& pass)
 {
-    IPAddress ip;
-    ip.fromString(host);
     client.setServer(ip, 1883);
     client.setCallback([this](char* t, uint8_t* d, unsigned int l){mqtt_callback(t,d,l);});
     mqtt_id=client_id;
