@@ -19,9 +19,7 @@ deps_led_strip = [
     sdk.get_variable('core'),
     arduino.get_variable('ESP8266WiFi'),
     arduino.get_variable('ArduinoOTA'),
-    arduino.get_variable('ESP8266HTTPClient'),
     arduino.get_variable('ESP8266mDNS'),
-    arduino.get_variable('ESP8266httpUpdate'),
     ArduinoJson.get_variable('lib'),
     PubSubClient.get_variable('lib'),
     DHTSensorLibrary.get_variable('lib'),
@@ -29,7 +27,7 @@ deps_led_strip = [
     RotaryEncoder.get_variable('lib')
 ]
 
-led_strip_exe = executable('led_strip.elf', ['node_base.cpp', 'led_strip.cpp', 'gpio_pin.cpp', 'mqtt_handler.cpp', 'sensor_dht22.cpp', 'node_led_strip.cpp', 'updater_http.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'rotary_encoder.cpp', 'button.cpp', 'trampoline_magic.cpp', 'periodic_message_poster.cpp'], dependencies: deps_led_strip)
+led_strip_exe = executable('led_strip.elf', ['node_base.cpp', 'led_strip.cpp', 'gpio_pin.cpp', 'mqtt_handler.cpp', 'sensor_dht22.cpp', 'node_led_strip.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'rotary_encoder.cpp', 'button.cpp', 'trampoline_magic.cpp', 'periodic_message_poster.cpp'], dependencies: deps_led_strip)
 
 led_strip_bin = custom_target('led_stip.bin',
   input : led_strip_exe,
@@ -42,7 +40,6 @@ deps_temperature_sensor = [
     sdk.get_variable('core'),
     arduino.get_variable('ESP8266WiFi'),
     arduino.get_variable('ArduinoOTA'),
-    arduino.get_variable('ESP8266HTTPClient'),
     arduino.get_variable('ESP8266mDNS'),
     PubSubClient.get_variable('lib'),
     DHTSensorLibrary.get_variable('lib'),
@@ -64,7 +61,6 @@ deps_power_switch = [
     sdk.get_variable('core'),
     arduino.get_variable('ESP8266WiFi'),
     arduino.get_variable('ArduinoOTA'),
-    arduino.get_variable('ESP8266HTTPClient'),
     arduino.get_variable('ESP8266mDNS'),
     PubSubClient.get_variable('lib')
 ]
