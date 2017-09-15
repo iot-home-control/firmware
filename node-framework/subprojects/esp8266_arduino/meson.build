@@ -54,3 +54,10 @@ ESP8266httpUpdate_includes = include_directories([library_base+'/ESP8266httpUpda
 ESP8266httpUpdate_lib = static_library('ESP8266httpUpdate', ESP8266httpUpdate_src, dependencies: [core, ESP8266WiFi, ESP8266HTTPClient], include_directories: ESP8266httpUpdate_includes)
 ESP8266httpUpdate = declare_dependency(include_directories: ESP8266httpUpdate_includes, link_with: ESP8266httpUpdate_lib)
 
+SPI_src = []
+foreach s: ['SPI.cpp']
+  SPI_src += library_base+'/SPI/'+s
+endforeach
+SPI_includes = include_directories([library_base+'/SPI/'])
+SPI_lib = static_library('SPI', SPI_src, dependencies: [core, ESP8266WiFi, ESP8266HTTPClient], include_directories: SPI_includes)
+SPI = declare_dependency(include_directories: SPI_includes, link_with: SPI_lib)

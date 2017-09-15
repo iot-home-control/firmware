@@ -12,6 +12,8 @@ NeoPixelBus=subproject('NeoPixelBus')
 RotaryEncoder=subproject('RotaryEncoder')
 OneWire=subproject('OneWire')
 ArduinoTemperatureControlLibrary=subproject('ArduinoTemperatureControlLibrary')
+Adafruit_GFX_Library=subproject('Adafruit_GFX_Library')
+Adafruit_PCD8544_Nokia_5110_LCD_library=subproject('Adafruit_PCD8544_Nokia_5110_LCD_library')
 
 deps_led_strip = [
     sdk.get_variable('core'),
@@ -72,6 +74,26 @@ power_switch_exe = executable('power_switch.elf', ['node_base.cpp', 'node_power_
 power_switch_bin = custom_target('power_switch.bin',
   input : power_switch_exe,
   output : 'power_switch.bin',
+  command : sdk.get_variable('esptoolize'),
+  build_by_default: true,
+)
+
+deps_wifi_indicator = [
+    sdk.get_variable('core'),
+    arduino.get_variable('ESP8266WiFi'),
+    arduino.get_variable('ArduinoOTA'),
+    arduino.get_variable('ESP8266mDNS'),
+    arduino.get_variable('SPI'),
+    PubSubClient.get_variable('lib'),
+    Adafruit_GFX_Library.get_variable('lib'),
+    Adafruit_PCD8544_Nokia_5110_LCD_library.get_variable('lib')
+]
+
+wifi_indicator_exe = executable('wifi_indicator.elf', ['node_base.cpp', 'node_wifi_indicator.cpp', 'mqtt_handler.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'periodic_message_poster.cpp'], dependencies: deps_wifi_indicator)
+
+switch_bin = custom_target('wifi_indicator.bin',
+  input : wifi_indicator_exe,
+  output : 'wifi_indicator.bin',
   command : sdk.get_variable('esptoolize'),
   build_by_default: true,
 )

@@ -4,3 +4,5 @@ DHT: https://github.com/adafruit/DHT-sensor-library/archive/1.2.3.zip
 NeoPixelBus: https://github.com/Makuna/NeoPixelBus/archive/2.1.4.zip
 OneWire: https://github.com/PaulStoffregen/OneWire
 Arduino-Temperature-Control-Library: https://github.com/milesburton/Arduino-Temperature-Control-Library
+Adafruit_PCD8544_Nokia_5110_LCD_library: Use fork from https://github.com/WereCatf/Adafruit-PCD8544-Nokia-5110-LCD-library
+Adafruit_GFX_Library: https://github.com/adafruit/Adafruit-GFX-Library
