@@ -8,6 +8,18 @@
 #include <Adafruit_PCD8544.h>
 #include <Fonts/Picopixel.h>
 
+/*
+ * Display      ESP NodeMCU Devboard (GPIO)
+ * RST   <----> D2 (4)
+ * CE    <----> D8 (15)
+ * DC    <----> D6 (12)
+ * DIN   <----> D7 (13)
+ * CLK   <----> D5 (14)
+ * VCC   <----> 3.3V / 5V
+ * LIGHT <----> GND/PWM Pin 0V -> On, VCC -> Off
+ * GND   <----> GND
+ */
+
 Adafruit_PCD8544 display = Adafruit_PCD8544(12/*D6*/, 15/*D8*/, 4/*D2*/);
 
 class rssi_indicator: public ticker_component
