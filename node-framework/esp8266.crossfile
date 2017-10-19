@@ -22,10 +22,10 @@ cpp_args = ['-D__ets__', '-DICACHE_FLASH', '-U__STRICT_ANSI__', '-DF_CPU=8000000
           '-falign-functions=4', '-std=c++11', '-MMD', '-ffunction-sections', '-fdata-sections']
 
 c_link_args = ['-g', '-w', '-Os', '-nostdlib', '-Wl,--no-check-sections', '-u', 'call_user_start',
-               '-Wl,-static', '-Teagle.flash.4m.ld', '-Wl,--gc-sections', '-Wl,-wrap,system_restart_local', '-Wl,-wrap,register_chipv6_phy']
+               '-Wl,-static', '-Teagle.flash.4m.ld', '-Wl,--gc-sections', '-Wl,-wrap,system_restart_local', '-Wl,-wrap,__register_chipv6_phy']
 
 cpp_link_args = ['-g', '-w', '-Os', '-nostdlib', '-Wl,--no-check-sections', '-u', 'call_user_start',
-                 '-Wl,-static', '-Teagle.flash.4m.ld', '-Wl,--gc-sections', '-Wl,-wrap,system_restart_local', '-Wl,-wrap,register_chipv6_phy']
+                 '-Wl,-static', '-Teagle.flash.4m.ld', '-Wl,--gc-sections', '-Wl,-wrap,system_restart_local', '-Wl,-wrap,spi_flash_read']
 
 [host_machine]
 system = 'bare'

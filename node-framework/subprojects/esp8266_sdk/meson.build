@@ -14,7 +14,7 @@ endforeach
 
 core_lib = static_library('ESP8266Core', esp8266_src, include_directories: esp8266_include)
 core=declare_dependency(include_directories: esp8266_include,
-link_args: ['-L'+esp8266_base+'/tools/sdk/lib', '-L'+esp8266_base+'/tools/sdk/ld', '-lm', '-lgcc', '-lhal', '-lphy', '-lnet80211', '-llwip_gcc', '-lmain', '-lpp', '-lsmartconfig', '-lwps', '-lcrypto', '-laxtls', '-lespnow', '-laxtls', '-lmesh', '-lwpa', '-lwpa2',
+link_args: ['-L'+esp8266_base+'/tools/sdk/lib', '-L'+esp8266_base+'/tools/sdk/ld', '-L'+esp8266_base+'/tools/sdk/libc/xtensa-lx106-elf/lib', '-lm', '-lgcc', '-lhal', '-lphy', '-lnet80211', '-llwip_gcc', '-ldriver', '-lmain', '-lpp', '-lsmartconfig', '-lwps', '-lcrypto', '-laxtls', '-lespnow', '-laxtls', '-lmesh', '-lwpa', '-lwpa2',
 'subprojects/esp8266_sdk/libESP8266Core.a', # this is an ugly hack. fix it
 '-lstdc++','-lc', '-lg'],
 link_with: core_lib)

@@ -18,14 +18,13 @@ if [ "$#" -lt 1 ]; then
 fi
 
 FILE="build/$1.bin"
-
-echo "Uploading file: $FILE"
-
 if [ ! -e "$FILE" ]; then
     usage
 else
     shift
 fi
+
+echo "Uploading file: $FILE"
 
 if [ "$1" == "serial" ]; then
     shift
