@@ -54,5 +54,6 @@ bool wifi_connector::is_connected() const
 
 bool wifi_connector::host_by_name(String hostname, IPAddress &ip)
 {
-    return WiFi.hostByName(hostname.c_str(), ip);
+    int rc=WiFi.hostByName(hostname.c_str(), ip);
+    return rc==1;
 }
