@@ -8,7 +8,7 @@
 
 #define OTA_PASS "SomePassword"
 
-#define MQTT_HOST "192.168.0.1"
+#define MQTT_HOST "mqtt.domain.tld"
 #define MQTT_USER "username"
 #define MQTT_PASS "password"
 
