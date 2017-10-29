@@ -61,7 +61,7 @@ void mqtt_handler::update()
     unsigned long now=millis();
     if(!client.connected())
     {
-        spl("!client.connected()");
+        spl("Not connected");
         if(!can_connect)
             return;
         
@@ -74,30 +74,30 @@ void mqtt_handler::update()
             
             if(on_disconnected)
                 on_disconnected();
-            spl("connected");
+            spl("Marked as disconnected");
         }
         if(!connecting)
         {
-            spl("!connecting start");
+            spl("Starting to connect");
             connecting=true;
             connecting_start_time=now;
             client.connect(mqtt_id.c_str(), mqtt_user.c_str(), mqtt_pass.c_str());
-            spl("!connecting stop");
+            spl("Connection request sent");
         }
         else if(now-connecting_start_time>(unsigned)get_retry_delay(connection_retry_count, connection_retry_interval))
         {
             connection_retry_count++;
             // retry
-            spl("retry");
+            spl("Retry");
             connecting=false;
         }
     }
     else
     {
-        spl("client.connected()");
+        spl("Connected");
         if(connecting)
         {
-            spl("connecting");
+            spl("Done connecting");
             connecting=false;
             connected=true;
             
@@ -108,7 +108,7 @@ void mqtt_handler::update()
         }
         if(now-last_subscription_check>subscription_check_interval)
         {
-            spl("check_subscriptions");
+            spl("Checking subscriptions");
             check_subscriptions();
         }
         client.loop();
