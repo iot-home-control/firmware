@@ -2,7 +2,11 @@
 
 node_base::node_base(bool serial_alternate_rx_tx): serial_alternate_pins(serial_alternate_rx_tx)
 {
-    device_id="esp8266-"+String(ESP.getChipId(), HEX);
+    String id = String(ESP.getChipId(), HEX);
+
+    while(id.length()<6)
+        id = "0"+id;
+    device_id="esp8266-"+id;
 }
 
 node_base::~node_base()
