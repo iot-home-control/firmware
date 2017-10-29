@@ -113,6 +113,7 @@ void node_base::on_wifi_disconnected()
 void node_base::on_mqtt_connected()
 {
     Serial.println("MQTT Connected");
+    message_poster.post_now();
 }
 
 void node_base::on_mqtt_disconnected()

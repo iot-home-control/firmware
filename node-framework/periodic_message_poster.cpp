@@ -18,3 +18,9 @@ void periodic_message_poster::update()
         last = now;
     }
 }
+
+void periodic_message_poster::post_now()
+{
+    mqtt->publish(topic,message);
+    last = millis();
+}
