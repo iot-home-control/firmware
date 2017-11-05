@@ -129,22 +129,24 @@ void button::update()
     if(button_down)
     {
         //Serial.print(".");
-        if(hold_time > click_minimum && hold_time<medium_click) {
+        /*if(hold_time > click_minimum && hold_time<medium_click) {
             if(!short_reached) {
                 Serial.println("Short reached");
                 short_reached = true;
             }
-        }
+        }*/
         if(hold_time >= medium_click && hold_time < long_click ) {
-            if(!medium_reached) {
-                Serial.println("Medium reached");
+            if(!medium_reached && cb_medium_reached) {
+                //Serial.println("Medium reached");
+                cb_medium_reached();
                 medium_reached = true;
             }
 
         }
-        if(hold_time > long_click && medium_reached) {
-            if(!long_reached) {
-                Serial.println("Long reached");
+        if(hold_time > long_click) {
+            if(!long_reached && cb_long_reached) {
+                //Serial.println("Long reached");
+                cb_long_reached();
                 long_reached = true;
             }
         }
@@ -153,6 +155,10 @@ void button::update()
         short_reached = false;
         medium_reached = false;
         long_reached = false;
+        if(cb_released)
+        {
+            cb_released();
+        }
     }
 
 
@@ -188,3 +194,19 @@ void button::on_double_short_click(button::callback cb)
 {
     cb_double_short=cb;
 }
+
+void button::on_long_click_reached(button::callback cb)
+{
+    cb_long_reached=cb;
+}
+
+void button::on_medium_click_reached(button::callback cb)
+{
+    cb_medium_reached=cb;
+}
+
+void button::on_released(button::callback cb)
+{
+    cb_released=cb;
+}
+

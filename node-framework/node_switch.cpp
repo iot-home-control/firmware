@@ -18,13 +18,19 @@ private:
 
     gpio_pin pin_relay;
     gpio_pin pin_led;
+    gpio_pin pin_led2;
 
     bool state=false;
 
     void switch_power(bool on);
     void handle_action_message(char* topic, unsigned char* data, unsigned int length);
 public:
-    void handle_button();
+    void handle_short_button();
+    void handle_long_button();
+    void handle_long_click_reached();
+    void handle_medium_click_reached();
+    void handle_released();
+    void handle_medium_button();
 };
 
 node_switch::node_switch(): node_base()
@@ -44,6 +50,9 @@ void node_switch::setup()
 //    pin_led.begin(13, gpio_pin::pin_out);
     components.push_back(&pin_led);
 
+    pin_led2.begin(13, gpio_pin::pin_out);
+    components.push_back(&pin_led2);
+
     btn.begin(4, gpio_pin::pin_in_pullup);
 //    btn.begin(0, gpio_pin::pin_in);
     components.push_back(&btn);
@@ -55,9 +64,15 @@ void node_switch::setup()
     mqtt.handle_topic("/switch/action", switch_action_handler);
     mqtt.handle_topic(get_action_topic("switch"), switch_action_handler);
 
-    btn.on_short_click(std::bind(&node_switch::handle_button, this));
+    btn.on_short_click(std::bind(&node_switch::handle_short_button, this));
+    btn.on_long_click(std::bind(&node_switch::handle_long_button, this));
+    btn.on_medium_click(std::bind(&node_switch::handle_medium_button, this));
+    btn.on_long_click_reached(std::bind(&node_switch::handle_long_click_reached, this));
+    btn.on_medium_click_reached(std::bind(&node_switch::handle_medium_click_reached, this));
+    btn.on_released(std::bind(&node_switch::handle_released, this));
 
     pin_led.write(HIGH);
+    pin_led2.write(LOW);
 }
 
 void node_switch::loop()
@@ -104,22 +119,58 @@ void node_switch::handle_action_message(char *topic, unsigned char *data, unsign
     }
 }
 
-void node_switch::handle_button()
+void node_switch::handle_medium_click_reached() {
+    pin_led2.write(HIGH);
+}
+
+void node_switch::handle_short_button()
 {
-    /*if(state)
+    Serial.println("short click");
+    if(state)
     {
-        Serial.println("Switch off the relay");
+
         mqtt.publish(get_state_topic("switch"),"local,off");
-        switch_power(false);
+        state=false;
 
     }
     else
     {
-        Serial.println("Switch on the relay");
         mqtt.publish(get_state_topic("switch"),"local,on");
-        switch_power(true);
-    }*/
+        state = true;
+    }
 }
+
+void node_switch::handle_long_button()
+{
+    Serial.println("long clicked");
+
+
+    mqtt.publish(get_state_topic("switch",1),"local,on");
+    delay(500);
+    mqtt.publish(get_state_topic("switch",1),"local,off");
+
+
+
+}
+
+void node_switch::handle_medium_button()
+{
+    Serial.println("medium clicked");
+}
+
+void node_switch::handle_long_click_reached()
+{
+    pin_led.write(LOW);
+
+}
+
+void node_switch::handle_released()
+{
+
+    pin_led.write(HIGH);
+    pin_led2.write(LOW);
+}
+
 
 //mqtt.publish("/switch/"+client_id+"/state","local,reboot");
 
