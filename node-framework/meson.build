@@ -74,6 +74,24 @@ power_switch_bin = custom_target('power_switch.bin',
   build_by_default: true,
 )
 
+deps_switch = [
+    sdk.get_variable('core'),
+    arduino.get_variable('ESP8266WiFi'),
+    arduino.get_variable('ArduinoOTA'),
+    arduino.get_variable('ESP8266mDNS'),
+    PubSubClient.get_variable('lib')
+]
+
+switch_exe = executable('switch.elf', ['node_base.cpp', 'node_switch.cpp', 'mqtt_handler.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'feedback_button.cpp', 'gpio_pin.cpp', 'trampoline_magic.cpp', 'periodic_message_poster.cpp'], dependencies: deps_switch)
+
+switch_bin = custom_target('switch.bin',
+  input : switch_exe,
+  output : 'switch.bin',
+  command : sdk.get_variable('esptoolize'),
+  build_by_default: true,
+)
+
+
 deps_wifi_indicator = [
     sdk.get_variable('core'),
     arduino.get_variable('ESP8266WiFi'),
