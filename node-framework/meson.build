@@ -52,10 +52,12 @@ led_strip_bin = custom_target('led_stip.bin',
 deps_temperature_sensor = deps_base + [
     DHTSensorLibrary.get_variable('lib'),
     OneWire.get_variable('lib'),
-    ArduinoTemperatureControlLibrary.get_variable('lib')
+    ArduinoTemperatureControlLibrary.get_variable('lib'),
+    arduino.get_variable('ESP8266HTTPClient'),
+    ArduinoJson.get_variable('lib')
 ]
 
-temperature_sensor_exe = executable('temperature_sensor.elf', cpp_base + ['node_temperature_sensor.cpp', 'sensor_dht22.cpp', 'sensor_ds1820.cpp'], dependencies: deps_temperature_sensor)
+temperature_sensor_exe = executable('temperature_sensor.elf', cpp_base + ['node_temperature_sensor.cpp', 'sensor_dht22.cpp', 'sensor_ds1820.cpp', 'config_loader.cpp'], dependencies: deps_temperature_sensor)
 
 temperature_sensor_bin = custom_target('temperature_sensor.bin',
   input : temperature_sensor_exe,
