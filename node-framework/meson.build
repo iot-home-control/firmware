@@ -81,7 +81,7 @@ power_switch_bin = custom_target('power_switch.bin',
 deps_switch = deps_base + [
 ]
 
-switch_exe = executable('switch.elf', ['node_base.cpp', 'node_switch.cpp', 'mqtt_handler.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'feedback_button.cpp', 'gpio_pin.cpp', 'trampoline_magic.cpp', 'periodic_message_poster.cpp'], dependencies: deps_switch)
+switch_exe = executable('switch.elf', cpp_base + ['node_switch.cpp', 'feedback_button.cpp', 'gpio_pin.cpp'], dependencies: deps_switch)
 
 switch_bin = custom_target('switch.bin',
   input : switch_exe,
