@@ -1,7 +1,8 @@
 project('led-strip', 'cpp', default_options: ['buildtype=minsize'])
 assert(meson.is_cross_build(), 'ESP8266 projects can only be built in a cross build environment.')
 
-add_global_arguments('-Wno-non-virtual-dtor', language: 'cpp')
+add_global_arguments(['-Wno-non-virtual-dtor', '-Wl,as-needed'], language: 'cpp')
+add_global_arguments(['-Wl,as-needed'], language: 'c')
 
 sdk=subproject('esp8266_sdk')
 arduino=subproject('esp8266_arduino')
