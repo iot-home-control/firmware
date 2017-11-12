@@ -1,4 +1,4 @@
-ArduinoJson: https://github.com/bblanchon/ArduinoJson/releases/download/v5.6.4/ArduinoJson-v5.6.4.zip
+ArduinoJson: https://github.com/bblanchon/ArduinoJson/releases/download/v5.11.2/ArduinoJson-v5.11.2.zip
 PubSubClient: https://github.com/knolleary/pubsubclient/archive/v2.6.zip
 DHT: https://github.com/adafruit/DHT-sensor-library/archive/1.2.3.zip
 NeoPixelBus: https://github.com/Makuna/NeoPixelBus/archive/2.1.4.zip
