@@ -15,13 +15,16 @@ ArduinoTemperatureControlLibrary=subproject('ArduinoTemperatureControlLibrary')
 Adafruit_GFX_Library=subproject('Adafruit_GFX_Library')
 Adafruit_PCD8544_Nokia_5110_LCD_library=subproject('Adafruit_PCD8544_Nokia_5110_LCD_library')
 
-deps_led_strip = [
+deps_base = [
     sdk.get_variable('core'),
     arduino.get_variable('ESP8266WiFi'),
     arduino.get_variable('ArduinoOTA'),
     arduino.get_variable('ESP8266mDNS'),
+    PubSubClient.get_variable('lib')
+]
+
+deps_led_strip = deps_base + [
     ArduinoJson.get_variable('lib'),
-    PubSubClient.get_variable('lib'),
     DHTSensorLibrary.get_variable('lib'),
     NeoPixelBus.get_variable('lib'),
     RotaryEncoder.get_variable('lib')
@@ -36,12 +39,7 @@ led_strip_bin = custom_target('led_stip.bin',
   build_by_default: true,
 )
 
-deps_temperature_sensor = [
-    sdk.get_variable('core'),
-    arduino.get_variable('ESP8266WiFi'),
-    arduino.get_variable('ArduinoOTA'),
-    arduino.get_variable('ESP8266mDNS'),
-    PubSubClient.get_variable('lib'),
+deps_temperature_sensor = deps_base + [
     DHTSensorLibrary.get_variable('lib'),
     OneWire.get_variable('lib'),
     ArduinoTemperatureControlLibrary.get_variable('lib')
@@ -57,12 +55,7 @@ temperature_sensor_bin = custom_target('temperature_sensor.bin',
 )
 
 
-deps_power_switch = [
-    sdk.get_variable('core'),
-    arduino.get_variable('ESP8266WiFi'),
-    arduino.get_variable('ArduinoOTA'),
-    arduino.get_variable('ESP8266mDNS'),
-    PubSubClient.get_variable('lib')
+deps_power_switch = deps_base + [
 ]
 
 power_switch_exe = executable('power_switch.elf', ['node_base.cpp', 'node_power_switch.cpp', 'mqtt_handler.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'button.cpp', 'gpio_pin.cpp', 'trampoline_magic.cpp', 'periodic_message_poster.cpp'], dependencies: deps_power_switch)
@@ -74,12 +67,8 @@ power_switch_bin = custom_target('power_switch.bin',
   build_by_default: true,
 )
 
-deps_switch = [
-    sdk.get_variable('core'),
-    arduino.get_variable('ESP8266WiFi'),
-    arduino.get_variable('ArduinoOTA'),
-    arduino.get_variable('ESP8266mDNS'),
-    PubSubClient.get_variable('lib')
+
+deps_switch = deps_base + [
 ]
 
 switch_exe = executable('switch.elf', ['node_base.cpp', 'node_switch.cpp', 'mqtt_handler.cpp', 'updater_ota.cpp', 'wifi_connector.cpp', 'feedback_button.cpp', 'gpio_pin.cpp', 'trampoline_magic.cpp', 'periodic_message_poster.cpp'], dependencies: deps_switch)
@@ -92,13 +81,8 @@ switch_bin = custom_target('switch.bin',
 )
 
 
-deps_wifi_indicator = [
-    sdk.get_variable('core'),
-    arduino.get_variable('ESP8266WiFi'),
-    arduino.get_variable('ArduinoOTA'),
-    arduino.get_variable('ESP8266mDNS'),
+deps_wifi_indicator = deps_base + [
     arduino.get_variable('SPI'),
-    PubSubClient.get_variable('lib'),
     Adafruit_GFX_Library.get_variable('lib'),
     Adafruit_PCD8544_Nokia_5110_LCD_library.get_variable('lib')
 ]
