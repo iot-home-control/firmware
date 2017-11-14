@@ -57,6 +57,32 @@ void node_temperature_sensor::setup()
         return sensor;
     });
 
+    loader.install_factory("ds1820", 0, [this](const JsonObject &obj, int vnode_id) -> ticker_component*
+    {
+        if(!obj.containsKey("pin") || !obj["pin"].is<int>())
+        {
+            Serial.println("Can't create ds1820. Pin is not set or not an int");
+            return nullptr;
+        }
+        int refresh_rate = 10;
+        if(obj.containsKey("rate") && obj["rate"].is<int>())
+            refresh_rate = obj["rate"].as<int>();
+        int pin = obj["pin"].as<int>();
+
+        sensor_ds1820 *sensor = new sensor_ds1820();
+        sensor->begin(pin, refresh_rate*1000, vnode_id);
+        sensor->on_temperature_changed=[this](const uint8_t index, const float v, const int vnode_offest)
+        {
+            Serial.print("Temperature on DS1820 #");
+            Serial.print(index);
+            Serial.print(" ");
+            Serial.println(v);
+            mqtt.publish(get_state_topic("temperature",vnode_offest+index),"local,"+String(v));
+        };
+
+        return sensor;
+    });
+
     loader.begin(components, digitalRead(0)==LOW);
 
     /*dht22.begin(5,10000);
