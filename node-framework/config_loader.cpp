@@ -92,17 +92,17 @@ void config_loader::begin(std::vector<ticker_component*> &components, bool skip_
         }
 
         int obj_type_id = it->type_id;
-        int obj_type_count = GetWithDef(type_counts, obj_type_id, 0);
-        LOGF("[cl] Found component! type=%s vnode_id=%d type_id=%i\n", obj_type, obj_type_count, obj_type_id);
+        int obj_vnode_id = GetWithDef(type_vnode_ids, obj_type_id, 0);
+        LOGF("[cl] Found component! type=%s vnode_id=%d type_id=%i\n", obj_type, obj_vnode_id, obj_type_id);
 
         ticker_component *component = nullptr;
-        component = it->creator(obj, obj_type_count);
+        component = it->creator(obj, obj_vnode_id);
         if(component == nullptr)
         {
             LOGLN("[cl] Factory function returned nullptr!!");
             continue;
         }
-        type_counts[obj_type_id] = obj_type_count+1;
+        type_vnode_ids[obj_type_id] = obj_vnode_id+1;
         components.push_back(component);
         LOGLN("[cl] Added component!");
     }
