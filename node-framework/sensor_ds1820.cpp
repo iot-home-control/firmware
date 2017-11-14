@@ -68,7 +68,7 @@ void sensor_ds1820::update()
         auto &addr=onewire_addresses.at(index);
         float temperature=dtlib.getTempC(addr.addr);
         float& last_temperature=last_temperatures.at(index);
-        if(temperature!=last_temperature)
+        if(temperature!=last_temperature && temperature!=-127.0)
         {
             last_temperature=temperature;
             if(on_temperature_changed)
