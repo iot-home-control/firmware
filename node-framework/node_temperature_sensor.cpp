@@ -26,7 +26,7 @@ void node_temperature_sensor::setup()
 
     pinMode(0, INPUT_PULLUP);
 
-    loader.install_factory("dht22", 0, [this](const JsonObject &obj, int type_count) -> ticker_component*
+    loader.install_factory("dht22", 0, [this](const JsonObject &obj, int vnode_id) -> ticker_component*
     {
         if(!obj.containsKey("pin") || !obj["pin"].is<int>())
         {
@@ -40,18 +40,18 @@ void node_temperature_sensor::setup()
         sensor_dht22 *sensor = new sensor_dht22();
         sensor->begin(pin, refresh_rate*1000);
 
-        sensor->on_temperature_changed=[this,type_count](const float v)
+        sensor->on_temperature_changed=[this,vnode_id](const float v)
         {
             Serial.print("Temperature changed ");
             Serial.println(v);
-            mqtt.publish(get_state_topic("temperature",type_count),"local,"+String(v));
+            mqtt.publish(get_state_topic("temperature",vnode_id),"local,"+String(v));
         };
 
-        sensor->on_humidity_changed=[this,type_count](const float v)
+        sensor->on_humidity_changed=[this,vnode_id](const float v)
         {
             Serial.print("Humidity changed ");
             Serial.println(v);
-            mqtt.publish(get_state_topic("humidity",type_count),"local,"+String(v));
+            mqtt.publish(get_state_topic("humidity",vnode_id),"local,"+String(v));
         };
 
         return sensor;
