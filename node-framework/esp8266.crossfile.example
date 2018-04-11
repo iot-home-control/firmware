@@ -1,0 +1,15 @@
+[binaries]
+c = '/home/trilader/code/esp8266-sdk/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc'
+cpp = '/home/trilader/code/esp8266-sdk/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-g++'
+ar = '/home/trilader/code/esp8266-sdk/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-ar'
+strip = '/home/trilader/code/esp8266-sdk/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-strip'
+
+[properties]
+esp8266_base = '/home/trilader/code/esp8266-sdk'
+esptool = '/home/trilader/code/esp8266-sdk/tools/esptool/esptool'
+
+[host_machine]
+system = 'bare'
+cpu_family = 'xtensa'
+cpu = 'lx106'
+endian = 'none'

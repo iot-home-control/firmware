@@ -12,11 +12,36 @@ foreach s: ['spiffs_hal.cpp', 'libc_replacements.c', 'Tone.cpp', 'uart.c', 'cbuf
   esp8266_src += esp8266_base+'/cores/esp8266/'+s
 endforeach
 
+search_dirs = [esp8266_base+'/tools/sdk/lib', esp8266_base+'/tools/sdk/ld', esp8266_base+'/tools/sdk/libc/xtensa-lx106-elf/lib']
+compiler = meson.get_compiler('cpp')
+
 core_lib = static_library('ESP8266Core', esp8266_src, include_directories: esp8266_include)
 core=declare_dependency(include_directories: esp8266_include,
-link_args: ['-L'+esp8266_base+'/tools/sdk/lib', '-L'+esp8266_base+'/tools/sdk/ld', '-L'+esp8266_base+'/tools/sdk/libc/xtensa-lx106-elf/lib', '-lm', '-lgcc', '-lhal', '-lphy', '-lnet80211', '-llwip_gcc', '-ldriver', '-lmain', '-lpp', '-lsmartconfig', '-lwps', '-lcrypto', '-laxtls', '-lespnow', '-laxtls', '-lmesh', '-lwpa', '-lwpa2',
-'subprojects/esp8266_sdk/libESP8266Core.a', # this is an ugly hack. fix it
-'-lstdc++','-lc', '-lg'],
+
+
+dependencies: [
+    compiler.find_library('m', dirs: search_dirs),
+    compiler.find_library('gcc', dirs: search_dirs),
+    compiler.find_library('stdc++', dirs: search_dirs),
+    compiler.find_library('c', dirs: search_dirs),
+    compiler.find_library('g', dirs: search_dirs),
+    compiler.find_library('hal', dirs: search_dirs),
+    compiler.find_library('phy', dirs: search_dirs),
+    compiler.find_library('net80211', dirs: search_dirs),
+    compiler.find_library('lwip_gcc', dirs: search_dirs),
+    compiler.find_library('driver', dirs: search_dirs),
+    compiler.find_library('main', dirs: search_dirs),
+    compiler.find_library('pp', dirs: search_dirs),
+    compiler.find_library('smartconfig', dirs: search_dirs),
+    compiler.find_library('wps', dirs: search_dirs),
+    compiler.find_library('crypto', dirs: search_dirs),
+    compiler.find_library('axtls', dirs: search_dirs),
+    compiler.find_library('espnow', dirs: search_dirs),
+    compiler.find_library('mesh', dirs: search_dirs),
+    compiler.find_library('wpa', dirs: search_dirs),
+    compiler.find_library('wpa2', dirs: search_dirs),
+],
+link_args: [ '-L'+esp8266_base+'/tools/sdk/ld' ],
 link_with: core_lib)
 
 esptoolize=[esptool,
