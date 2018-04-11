@@ -37,7 +37,6 @@ dependencies: [
     compiler.find_library('crypto', dirs: search_dirs),
     compiler.find_library('axtls', dirs: search_dirs),
     compiler.find_library('espnow', dirs: search_dirs),
-    compiler.find_library('mesh', dirs: search_dirs),
     compiler.find_library('wpa', dirs: search_dirs),
     compiler.find_library('wpa2', dirs: search_dirs),
 ],
