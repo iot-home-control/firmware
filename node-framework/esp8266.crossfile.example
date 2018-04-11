@@ -1,3 +1,4 @@
+; Copy this to ~/.local/share/meson/cross/
 [binaries]
 c = '/home/trilader/code/esp8266-sdk/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-gcc'
 cpp = '/home/trilader/code/esp8266-sdk/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-g++'
