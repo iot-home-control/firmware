@@ -1,8 +1,7 @@
-project('led-strip', 'cpp', default_options: ['buildtype=minsize'])
+project('node-framework', 'cpp', default_options: ['buildtype=minsize'])
 subdir('sdk_setup')
 
-add_global_arguments(['-Wno-non-virtual-dtor', '-Wl,as-needed'], language: 'cpp')
-add_global_arguments(['-Wl,as-needed'], language: 'c')
+add_global_arguments(['-Wno-non-virtual-dtor'], language: 'cpp')
 
 sdk=subproject('esp8266_sdk')
 arduino=subproject('esp8266_arduino')
@@ -79,7 +78,6 @@ power_switch_bin = custom_target('power_switch.bin',
   build_by_default: true,
 )
 
-
 deps_switch = deps_base + [
 ]
 
@@ -92,7 +90,6 @@ switch_bin = custom_target('switch.bin',
   build_by_default: true,
 )
 
-
 deps_wifi_indicator = deps_base + [
     arduino.get_variable('SPI'),
     Adafruit_GFX_Library.get_variable('lib'),
@@ -101,7 +98,7 @@ deps_wifi_indicator = deps_base + [
 
 wifi_indicator_exe = executable('wifi_indicator.elf', cpp_base + ['node_wifi_indicator.cpp'], dependencies: deps_wifi_indicator)
 
-switch_bin = custom_target('wifi_indicator.bin',
+wifi_indicator_bin = custom_target('wifi_indicator.bin',
   input : wifi_indicator_exe,
   output : 'wifi_indicator.bin',
   command : sdk.get_variable('esptoolize'),
