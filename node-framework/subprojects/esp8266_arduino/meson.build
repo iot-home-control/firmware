@@ -61,3 +61,11 @@ endforeach
 SPI_includes = include_directories([library_base+'/SPI/'])
 SPI_lib = static_library('SPI', SPI_src, dependencies: [core, ESP8266WiFi, ESP8266HTTPClient], include_directories: SPI_includes)
 SPI = declare_dependency(include_directories: SPI_includes, link_with: SPI_lib)
+
+Wire_src = []
+foreach s: ['Wire.cpp']
+  Wire_src += library_base+'/Wire/'+s
+endforeach
+Wire_includes = include_directories([library_base+'/Wire/'])
+Wire_lib = static_library('Wire', Wire_src, dependencies: [core], include_directories: Wire_includes)
+Wire = declare_dependency(include_directories: Wire_includes, link_with: Wire_lib)
