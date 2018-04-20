@@ -15,8 +15,6 @@ public:
     void loop() override;
     void on_wifi_connected() override;
 private:
-    //sensor_dht22 dht22;
-    //sensor_ds1820 ds1820;
     config_loader loader;
 };
 
@@ -42,14 +40,14 @@ void node_temperature_sensor::setup()
 
         sensor->on_temperature_changed=[this,vnode_id](const float v)
         {
-            Serial.print("Temperature changed ");
+            Serial.printf("DHT22 #%d Temperature changed: ", vnode_id);
             Serial.println(v);
             mqtt.publish(get_state_topic("temperature",vnode_id),"local,"+String(v));
         };
 
         sensor->on_humidity_changed=[this,vnode_id](const float v)
         {
-            Serial.print("Humidity changed ");
+            Serial.printf("DHT22 #%d Humidity changed: ", vnode_id);
             Serial.println(v);
             mqtt.publish(get_state_topic("humidity",vnode_id),"local,"+String(v));
         };
@@ -84,32 +82,6 @@ void node_temperature_sensor::setup()
     });
 
     loader.begin(components, digitalRead(0)==LOW);
-
-    /*dht22.begin(5,10000);
-    dht22.on_temperature_changed=[this](const float v)
-    {
-        Serial.print("Temperature changed ");
-        Serial.println(v);
-        mqtt.publish(get_state_topic("temperature"),"local,"+String(v));
-    };
-    dht22.on_humidity_changed=[this](const float v)
-    {
-        Serial.print("Humidity changed ");
-        Serial.println(v);
-        mqtt.publish(get_state_topic("humidity"),"local,"+String(v));
-    };
-    components.push_back(&dht22);
-
-    ds1820.begin(4,10000,1);
-    ds1820.on_temperature_changed=[this](const uint8_t index, const float v, const int vnode_offest)
-    {
-        Serial.print("Temperature on DS1820 #");
-        Serial.print(index);
-        Serial.print(" ");
-        Serial.println(v);
-        mqtt.publish(get_state_topic("temperature",vnode_offest+index),"local,"+String(v));
-    };
-    components.push_back(&ds1820);*/
 }
 
 void node_temperature_sensor::loop()
