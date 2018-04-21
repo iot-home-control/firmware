@@ -19,12 +19,12 @@ Base this e.g. in `$HOME/prog` which we will use throughout the examples. In the
      * `git clone --depth=1 https://github.com/esp8266/Arduino.git Arduino-esp8266-sdk` 
      * A directory is created automatically: `$HOME/prog/Arduino-esp8266-sdk` but that is not touched further.
 
-### Get the sources of _node-framework_:
+### Get the sources of _node-framework_
   * `cd $HOME/prog`
   * `git clone --depth=1 git@git.schroedingers-bit.net:home-control/modules.git`
   * Change into the new directory: `cd modules` and stay there !
 
-### Configure _meson_ to cross-build using the _ESP8266 Arduino SDK_:
+### Configure _meson_ to cross-build using the _ESP8266 Arduino SDK_
   * have or make a local configuration directory for _meson_:
     * `mkdir -p $HOME/.local/share/meson/cross/`
   * `cp $HOME/prog/modules/node-framework/esp8266.crossfile.example $HOME/.local/share/meson/cross/esp8266.crossfile` 
@@ -53,23 +53,23 @@ cpu = 'lx106'
 endian = 'none'
 ```
 
-### Configure cross-compiling _meson_  for the _node-framework_:
+### Configure a cross compiling _meson_ for the _node-framework_
   * `cd $HOME/prog/modules/node-framework`
   * Verify the _meson.build_ file: `ls -l meson.build`
   * Build a configuration: `meson --cross-file=esp8266.crossfile build`
 
-### Test build the existing _node-framework_ projects using _ninja_:
+### Test build the existing _node-framework_ projects using _ninja_
   * `cd $HOME/prog/modules/node-framework`
   * Prepare a build directory:
     * `mkdir build`
   * `ninja -C build`
     * This should complete without error.
 
-  ## Roll your own project:
+## Roll your own project
   * Example: an (empty) Arduino project, based on the ESP8266 Arduino SPISlave_Test [^1].
 [^1]: https://github.com/esp8266/Arduino/blob/master/libraries/SPISlave/examples/SPISlave_Test/SPISlave_Test.ino
  * We base this project's source file names on __spi-slave-test__ and call it __spi_slave_test__ in the build environment.
-  ### Create the source code:
+  ### Create the source code
  * `cd $HOME/prog/modules/node-framework`
  * Create the source: `cat >> spi-slave-test.cpp`
 
@@ -86,8 +86,8 @@ void loop()
 }
 ```
 
-### Add the project to the _meson.build_ file:
- * This project will use SPI which we pull from Arduino's pre-configured libraries using _arduino.get_variable('SPISlave')_ (TODO: Use SPISlave, not, SPI, working on it ...)
+### Add the project to the _meson.build_ file
+ * This project will use SPI which we pull from Arduino's pre-configured libraries using `arduino.get_variable('SPISlave')` (TODO: Use SPISlave, not, SPI, working on it ...)
  * `cd $HOME/prog/modules/node-framework`
  * `cat >> meson.build`
 
@@ -104,11 +104,11 @@ spi_slave_test_bin = custom_target('spi_slave_test.bin',
 )
 ```
 
-#### Add the _SPISlave_  library from the _ESP8266 Arduino SDK_  to the _meson_ configuration:
+#### Add the _SPISlave_  library from the _ESP8266 Arduino SDK_  to the _meson_ configuration
   * `editor subprojects/esp8266_arduino/meson.build`
   * :TODO:
 
-### Explanation of cross-compilation process:
+### Explanation of cross-compilation process
 * Sources -> ELF binary -> stripping -> .bin image extraction -> ESP8266 styling (esptoolize)
 
 ### Build it!
