@@ -9,9 +9,8 @@ core=sdk.get_variable('core')
 
 library_base = esp8266_base + '/libraries/'
 
-
 ESP8266WiFi_src = []
-foreach s: ['ESP8266WiFiAP.cpp', 'ESP8266WiFi.cpp', 'ESP8266WiFiGeneric.cpp', 'ESP8266WiFiMulti.cpp', 'ESP8266WiFiScan.cpp', 'ESP8266WiFiSTA.cpp', 'WiFiClient.cpp', 'WiFiClientSecure.cpp', 'WiFiServer.cpp', 'WiFiUdp.cpp']
+foreach s: ['BearSSLHelpers.cpp', 'CertStoreBearSSL.cpp', 'ESP8266WiFiAP.cpp', 'ESP8266WiFi.cpp', 'ESP8266WiFiGeneric.cpp', 'ESP8266WiFiMulti.cpp', 'ESP8266WiFiScan.cpp', 'ESP8266WiFiSTA.cpp', 'WiFiClient.cpp', 'WiFiClientSecureAxTLS.cpp', 'WiFiClientSecureBearSSL.cpp', 'WiFiServer.cpp', 'WiFiServerSecureAxTLS.cpp', 'WiFiServerSecureBearSSL.cpp', 'WiFiUdp.cpp']
   ESP8266WiFi_src += library_base+'/ESP8266WiFi/src/'+s
 endforeach
 ESP8266WiFi_includes = include_directories([library_base+'/ESP8266WiFi/src/'])
