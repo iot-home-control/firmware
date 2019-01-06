@@ -1,60 +1,70 @@
+// kate: hl C++;
+// vim: filetype=c++:
+
 #include "node_base.h"
 
-#include <memory>
-#include <functional>
-
-#include "gpio_pin.h"
-#include "button.h"
+#include "relay.h"
+#include "config_loader.h"
+#include <ArduinoJson.h>
 
 class node_power_switch: public node_base
 {
 public:
     node_power_switch();
 
-    void setup();
-    void loop();
+    void setup() override;
+    void loop() override;
+    void on_wifi_connected() override;
 private:
-    button btn;
-
-    gpio_pin pin_relay;
-    gpio_pin pin_led;
-
-    bool state=false;
-
-    void switch_power(bool on);
-    void handle_action_message(char* topic, unsigned char* data, unsigned int length);
-public:
-    void handle_button();
+    config_loader loader;
 };
 
 node_power_switch::node_power_switch(): node_base()
 {
-
 }
 
 void node_power_switch::setup()
 {
     node_base::setup();
 
-    pin_relay.begin(5, gpio_pin::pin_out);
-    components.push_back(&pin_relay);
+    loader.install_factory("switch", 0, [this](const JsonObject &obj, int vnode_id) -> ticker_component*
+    {
+        bool invert_relay = false;
+        bool invert_led = false;
+        bool start_on = false;
+        char relay_pin = -1;
+        char led_pin = -1;
+        char button_pin = -1;
 
-    pin_led.begin(2, gpio_pin::pin_out);
-    components.push_back(&pin_led);
+        if(!obj.containsKey("relay_pin") || !obj["relay_pin"].is<int>())
+        {
+            Serial.println("Can't create relay. relay_pin is not set or not an int");
+            return nullptr;
+        }
+        else
+        {
+            relay_pin = obj["relay_pin"].as<int>();
+        }
 
-    btn.begin(4, gpio_pin::pin_in);
-    components.push_back(&btn);
+        relay *r = new relay("switch");
 
-    auto switch_action_handler = std::bind(&node_power_switch::handle_action_message, this,
-                                           std::placeholders::_1,
-                                           std::placeholders::_2,
-                                           std::placeholders::_3);
-    mqtt.handle_topic("/switch/action", switch_action_handler);
-    mqtt.handle_topic(get_action_topic("switch"), switch_action_handler);
+        if(obj.containsKey("invert_relay") && obj["invert_relay"].is<bool>())
+            invert_relay = obj["invert_relay"].as<bool>();
+        if(obj.containsKey("invert_led") && obj["invert_led"].is<bool>())
+            invert_led = obj["invert_led"].as<bool>();
+        if(obj.containsKey("start_on") && obj["start_on"].is<bool>())
+            start_on = obj["start_on"].as<bool>();
+        if(obj.containsKey("led_pin") && obj["led_pin"].is<int>())
+            led_pin = obj["led_pin"].as<int>();
+        if(obj.containsKey("button_pin") && obj["button_pin"].is<int>())
+            button_pin = obj["button_pin"].as<int>();
 
-    btn.on_short_click(std::bind(&node_power_switch::handle_button, this));
+        r->begin(this, vnode_id, relay_pin, led_pin, button_pin, start_on, invert_relay, invert_led);
 
-    pin_led.write(HIGH);
+        return r;
+    });
+
+    loader.begin(components, digitalRead(0)==LOW);
 }
 
 void node_power_switch::loop()
@@ -63,62 +73,16 @@ void node_power_switch::loop()
     node_base::wait_for_loop_timing();
 }
 
-void node_power_switch::switch_power(bool on)
+void node_power_switch::on_wifi_connected()
 {
-    if(on)
+    node_base::on_wifi_connected();
+
+    if(loader.check(device_id, CONFIG_SERVER))
     {
-        pin_relay.write(HIGH);
-        pin_led.write(LOW);
-        state = true;
-    }
-    else
-    {
-        pin_relay.write(LOW);
-        pin_led.write(HIGH);
-        state = false;
+        Serial.println("/config.json was updated. Reboot...");
+        ESP.restart();
     }
 }
-
-void node_power_switch::handle_action_message(char *topic, unsigned char *data, unsigned int length)
-{
-    (void)topic;
-    char s[length+1];
-    memcpy(s,data,length);
-    s[length]=0;
-    String data_str(s);
-    String publish_topic=get_state_topic("switch");
-    if(data_str=="on")
-    {
-        Serial.println("[MQTT] Turning on.");
-        mqtt.publish(publish_topic,"mqtt,on");
-        switch_power(true);
-    }
-    else if(data_str=="off")
-    {
-        Serial.println("[MQTT] Turning off.");
-        mqtt.publish(publish_topic,"mqtt,off");
-        switch_power(false);
-    }
-}
-
-void node_power_switch::handle_button()
-{
-    if(state)
-    {
-        Serial.println("Switch off the relay");
-        mqtt.publish(get_state_topic("switch"),"local,off");
-        switch_power(false);
-
-    }
-    else
-    {
-        Serial.println("Switch on the relay");
-        mqtt.publish(get_state_topic("switch"),"local,on");
-        switch_power(true);
-    }
-}
-
-//mqtt.publish("/switch/"+client_id+"/state","local,reboot");
 
 node_power_switch node;
 

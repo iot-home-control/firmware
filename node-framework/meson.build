@@ -67,9 +67,11 @@ temperature_sensor_bin = custom_target('temperature_sensor.bin',
 
 
 deps_power_switch = deps_base + [
+    arduino.get_variable('ESP8266HTTPClient'),
+    ArduinoJson.get_variable('lib'),
 ]
 
-power_switch_exe = executable('power_switch.elf', cpp_base + ['node_power_switch.cpp', 'button.cpp', 'gpio_pin.cpp'], dependencies: deps_power_switch)
+power_switch_exe = executable('power_switch.elf', cpp_base + ['node_power_switch.cpp', 'button.cpp', 'gpio_pin.cpp', 'config_loader.cpp', 'relay.cpp'], dependencies: deps_power_switch)
 
 power_switch_bin = custom_target('power_switch.bin',
   input : power_switch_exe,
