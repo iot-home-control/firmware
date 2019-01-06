@@ -2,7 +2,7 @@
 
 set -e
 
-TOOL_ROOT="../../../esp8266-sdk/tools"
+TOOL_ROOT="../../esp8266-sdk/tools"
 ESP_TOOL="$TOOL_ROOT/esptool/esptool"
 OTA_TOOL="$TOOL_ROOT/espota.py"
 

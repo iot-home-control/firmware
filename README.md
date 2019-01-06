@@ -4,16 +4,18 @@
 * If you have a recent/decent OS:
   * install _meson_
   * install _ninja_
-* Ancient OS or No tooling for your OS? Look in doc/Prepare_meson_ninja.md
+* Ancient OS or no tooling for your OS? Look in doc/Prepare_meson_ninja.md
 
 ### Prepare the build system
 Base this e.g. in `$HOME/prog` which we will use throughout the examples. In the following, the username running all this is _jack_ , so `$HOME/prog` expands to `/home/jack/prog`. Change this to match what you have on your system.
+
   1. Test your binaries/paths: 
    * `cd $HOME`
    * `meson  --version`
-     * 0.44.1 (or newer, YMMV)
+     * 0.48.0 (or newer, YMMV)
    * `ninja  --version`
-     * 1.7.1.git (or newer, YMMV)
+     * 1.8.2 (or newer, YMMV)
+
   1. get the _ESP8266 Arduino SDK_, but please don't name it just "Arduino":
      * `cd $HOME/prog`
      * `git clone --depth=1 https://github.com/esp8266/Arduino.git Arduino-esp8266-sdk` 
@@ -27,7 +29,7 @@ Base this e.g. in `$HOME/prog` which we will use throughout the examples. In the
 ### Configure _meson_ to cross-build using the _ESP8266 Arduino SDK_
   * have or make a local configuration directory for _meson_:
     * `mkdir -p $HOME/.local/share/meson/cross/`
-  * `cp $HOME/prog/modules/node-framework/esp8266.crossfile.example $HOME/.local/share/meson/cross/esp8266.crossfile` 
+  * `cp $HOME/prog/modules/esp8266.crossfile.example $HOME/.local/share/meson/cross/esp8266.crossfile`
    * Use your preferred text editor, we call it _editor_, to edit your copy of the _crossfile_:
      * `editor $HOME/.local/share/meson/cross/esp8266.crossfile`
      * In the _crossfile_ all paths must be given absolute and there is no expansion for _$HOME_ or other variables.
@@ -46,6 +48,9 @@ strip = '/home/jack/prog/Arduino-esp8266-sdk/tools/xtensa-lx106-elf/bin/xtensa-l
 esp8266_base = '/home/jack/prog/Arduino-esp8266-sdk/'
 esptool = '/home/jack/prog/Arduino-esp8266-sdk/tools/esptool/esptool'
 
+c_link_args = ['-nostdlib']
+cpp_link_args = ['-nostdlib']
+
 [host_machine]
 system = 'bare'
 cpu_family = 'xtensa'
@@ -53,13 +58,13 @@ cpu = 'lx106'
 endian = 'none'
 ```
 
-### Configure a cross compiling _meson_ for the _node-framework_
-  * `cd $HOME/prog/modules/node-framework`
+### Configure a cross compiling _meson_
+  * `cd $HOME/prog/modules`
   * Verify the _meson.build_ file: `ls -l meson.build`
   * Build a configuration: `meson --cross-file=esp8266.crossfile build`
 
-### Test build the existing _node-framework_ projects using _ninja_
-  * `cd $HOME/prog/modules/node-framework`
+### Test build the existing projects using _ninja_
+  * `cd $HOME/prog/modules`
   * Prepare a build directory:
     * `mkdir build`
   * `ninja -C build`
@@ -70,7 +75,7 @@ endian = 'none'
 [^1]: https://github.com/esp8266/Arduino/blob/master/libraries/SPISlave/examples/SPISlave_Test/SPISlave_Test.ino
  * We base this project's source file names on __spi-slave-test__ and call it __spi_slave_test__ in the build environment.
   ### Create the source code
- * `cd $HOME/prog/modules/node-framework`
+ * `cd $HOME/prog/modules`
  * Create the source: `cat >> spi-slave-test.cpp`
 
 ``` c++
@@ -88,7 +93,7 @@ void loop()
 
 ### Add the project to the _meson.build_ file
  * This project will use SPI which we pull from Arduino's pre-configured libraries using `arduino.get_variable('SPISlave')` (TODO: Use SPISlave, not, SPI, working on it ...)
- * `cd $HOME/prog/modules/node-framework`
+ * `cd $HOME/prog/modules`
  * `cat >> meson.build`
 
 ``` python3
@@ -112,6 +117,6 @@ spi_slave_test_bin = custom_target('spi_slave_test.bin',
 * Sources -> ELF binary -> stripping -> .bin image extraction -> ESP8266 styling (esptoolize)
 
 ### Build it!
- * `cd $HOME/prog/modules/node-framework`
+ * `cd $HOME/prog/modules`
  * `ninja -C build`
 
