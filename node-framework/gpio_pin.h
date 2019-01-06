@@ -12,6 +12,7 @@ private:
     bool is_input, is_output;
     bool last_state;
     volatile bool int_state;
+    bool begin_called;
 public:
     enum pin_dir
     {

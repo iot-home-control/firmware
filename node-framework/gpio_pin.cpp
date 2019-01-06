@@ -1,6 +1,6 @@
 #include "gpio_pin.h"
 
-gpio_pin::gpio_pin(): last_state(false)
+gpio_pin::gpio_pin(): last_state(false), begin_called(false)
 {
 }
 
@@ -18,10 +18,13 @@ void gpio_pin::begin(unsigned char pin, pin_dir dir)
         int_state=digitalRead(this->pin);
     });
     attachInterrupt(digitalPinToInterrupt(pin),tramps[isr_index],CHANGE);*/
+    begin_called = true;
 }
 
 bool gpio_pin::read()
 {
+    if(!begin_called)
+        return false;
     if(is_output)
         return false;
     return last_state;
@@ -29,6 +32,8 @@ bool gpio_pin::read()
 
 void gpio_pin::write(bool value)
 {
+    if(!begin_called)
+        return;
     if(is_output)
     {
         digitalWrite(pin, value);
@@ -37,6 +42,8 @@ void gpio_pin::write(bool value)
 
 void gpio_pin::update()
 {
+    if(!begin_called)
+        return;
     if(is_input)
     {
         bool state=digitalRead(pin);

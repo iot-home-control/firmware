@@ -103,7 +103,7 @@ void button::isr()
     in_isr=false;
 }
 
-button::button()
+button::button(): begin_called(false)
 {
 
 }
@@ -116,10 +116,13 @@ void button::begin(unsigned char pin, gpio_pin::pin_dir dir)
 
     isr_index=allocate_trampoline(std::bind(&button::isr, this));
     attachInterrupt(digitalPinToInterrupt(pin), tramps[isr_index], CHANGE);
+    begin_called = true;
 }
 
 void button::update()
 {
+    if(!begin_called)
+        return;
     isr();
     if(trigger==event_trigger::single_short && cb_short)
         cb_short();

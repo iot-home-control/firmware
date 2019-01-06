@@ -20,6 +20,7 @@ private:
         double_short,
     };
 
+    bool begin_called;
     gpio_pin _pin;
     unsigned char pin;
     int isr_index=-1;
