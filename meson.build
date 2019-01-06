@@ -22,7 +22,7 @@ deps_base = [
     arduino.get_variable('ESP8266mDNS'),
     PubSubClient.get_variable('lib'),
     arduino.get_variable('ESP8266HTTPClient'),
-    ArduinoJson.get_variable('lib')
+    ArduinoJson.get_variable('lib'),
 ]
 
 cpp_base = [
@@ -32,14 +32,14 @@ cpp_base = [
     'components/wifi_connector.cpp',
     'components/trampoline_magic.cpp',
     'components/periodic_message_poster.cpp',
-    'components/config_loader.cpp'
+    'components/config_loader.cpp',
 ]
 
 deps_led_strip = deps_base + [
     ArduinoJson.get_variable('lib'),
     DHTSensorLibrary.get_variable('lib'),
     NeoPixelBus.get_variable('lib'),
-    RotaryEncoder.get_variable('lib')
+    RotaryEncoder.get_variable('lib'),
 ]
 
 led_strip_exe = executable('led_strip.elf', cpp_base + ['node_led_strip.cpp', 'io/led_strip.cpp', 'io/gpio_pin.cpp', 'io/rotary_encoder.cpp', 'io/button.cpp'], dependencies: deps_led_strip)
@@ -94,7 +94,7 @@ switch_bin = custom_target('switch.bin',
 deps_wifi_indicator = deps_base + [
     arduino.get_variable('SPI'),
     Adafruit_GFX_Library.get_variable('lib'),
-    Adafruit_PCD8544_Nokia_5110_LCD_library.get_variable('lib')
+    Adafruit_PCD8544_Nokia_5110_LCD_library.get_variable('lib'),
 ]
 
 wifi_indicator_exe = executable('wifi_indicator.elf', cpp_base + ['node_wifi_indicator.cpp'], dependencies: deps_wifi_indicator)
