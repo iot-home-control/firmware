@@ -160,6 +160,10 @@ bool config_loader::check(const String &device_id, const String &config_server) 
             return NO_REBOOT;
         return DO_REBOOT;
     }
+    else
+    {
+        LOGF("[cl] Config version is up to date: %i (remote: %i)\n", current_config_version, downloaded_config_version);
+    }
     return NO_REBOOT;
 }
 
