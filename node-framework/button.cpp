@@ -10,10 +10,11 @@ void button::isr()
     bool button=digitalRead(pin);
     unsigned long time_now=millis();
 
+    const bool is_double_click_timeout = (time_now-last_click_stop)>timeout_double_click; // Enough time has passed since the last click
     // Handle double click timeout
     if(first_click_detected // There is a click pending
         && !button_down  // Not currently processing a click
-        && (time_now-last_click_stop)>timeout_double_click) // Enough time has passed since the last click
+        && is_double_click_timeout)
     {
         first_click_detected=false;
         //Serial.println("Short");
