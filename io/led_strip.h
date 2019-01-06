@@ -1,9 +1,9 @@
 #pragma once
 
-#include "config.h"
+#include "../config.h"
 #include "NeoPixelBus.h"
 #include "NeoPixelAnimator.h"
-#include "ticker_component.h"
+#include "../components/ticker_component.h"
 #include <memory>
 #include <vector>
 

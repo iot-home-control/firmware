@@ -1,5 +1,5 @@
 #include "led_strip.h"
-#include "util.h"
+#include "../components/util.h"
 
 void led_strip::set_timescale(led_strip::anim_duration duration)
 {

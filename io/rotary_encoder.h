@@ -4,8 +4,8 @@
 #include <functional>
 
 #include "RotaryEncoder.h"
-#include "trampoline_magic.h"
-#include "ticker_component.h"
+#include "../components/trampoline_magic.h"
+#include "../components/ticker_component.h"
 #include "button.h"
 
 class rotary_encoder: public ticker_component

@@ -1,11 +1,11 @@
 // kate: hl C++;
 // vim: filetype=c++:
 
-#include "node_base.h"
+#include "components/node_base.h"
 
-#include "sensor_ds1820.h"
-#include "sensor_dht22.h"
-#include "config_loader.h"
+#include "io/sensor_ds1820.h"
+#include "io/sensor_dht22.h"
+#include "components/config_loader.h"
 #include <ArduinoJson.h>
 
 class node_temperature_sensor: public node_base

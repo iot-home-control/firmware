@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <functional>
-#include "ticker_component.h"
+#include "../components/ticker_component.h"
 
 class gpio_pin: public ticker_component
 {

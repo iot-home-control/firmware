@@ -1,7 +1,7 @@
 // kate: hl C++;
 // vim: filetype=c++:
 
-#include "node_base.h"
+#include "components/node_base.h"
 
 #include <SPI.h>
 #include <Adafruit_GFX.h>

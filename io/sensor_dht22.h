@@ -1,7 +1,7 @@
 #ifndef SENSOR_DHT22_H
 #define SENSOR_DHT22_H
 
-#include "ticker_component.h"
+#include "../components/ticker_component.h"
 #include <DHT.h>
 #include <functional>
 

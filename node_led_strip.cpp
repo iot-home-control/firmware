@@ -1,10 +1,10 @@
-#include "node_base.h"
+#include "components/node_base.h"
 
 #include <memory>
-#include "gpio_pin.h"
-#include "led_strip.h"
-#include "rotary_encoder.h"
-#include "util.h"
+#include "io/gpio_pin.h"
+#include "io/led_strip.h"
+#include "io/rotary_encoder.h"
+#include "components/util.h"
 
 static RgbColor colors[]={
   {255, 147, 41}, //Candle (1900K)

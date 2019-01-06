@@ -1,10 +1,10 @@
-#include "node_base.h"
+#include "components/node_base.h"
 
 #include <memory>
 #include <functional>
 
-#include "gpio_pin.h"
-#include "feedback_button.h"
+#include "io/gpio_pin.h"
+#include "io/feedback_button.h"
 
 class node_switch: public node_base
 {

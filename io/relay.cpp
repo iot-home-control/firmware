@@ -1,6 +1,6 @@
 #include "relay.h"
 
-#include "node_base.h"
+#include "../components/node_base.h"
 
 relay::relay(const String type_name): type_name(type_name)
 {

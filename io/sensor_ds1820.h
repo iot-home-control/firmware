@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ticker_component.h"
+#include "../components/ticker_component.h"
 
 #include <functional>
 #include <vector>

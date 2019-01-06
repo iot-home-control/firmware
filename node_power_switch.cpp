@@ -1,10 +1,10 @@
 // kate: hl C++;
 // vim: filetype=c++:
 
-#include "node_base.h"
+#include "components/node_base.h"
 
-#include "relay.h"
-#include "config_loader.h"
+#include "io/relay.h"
+#include "components/config_loader.h"
 #include <ArduinoJson.h>
 
 class node_power_switch: public node_base
