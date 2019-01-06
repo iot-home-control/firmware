@@ -1,0 +1,1 @@
+option('boardtype', type : 'combo', choices : ['nodemcu', 'sonoff'], description : 'Select the board type to use', yield : true)

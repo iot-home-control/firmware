@@ -19,7 +19,7 @@ subdir('ld')
 
 core_lib = static_library('ESP8266Core', esp8266_src, include_directories: esp8266_include)
 core=declare_dependency(include_directories: esp8266_include,
-sources: [customize_sdk],
+sources: [customize_sdk_4m, customize_sdk_1m0],
 dependencies: [
     compiler.find_library('m', dirs: search_dirs),
     compiler.find_library('gcc', dirs: search_dirs),
@@ -46,12 +46,22 @@ dependencies: [
 link_args: [ '-L'+sdk_ld_dir ],
 link_with: core_lib)
 
+board_esptoolize_flash_modes = {
+    'nodemcu' : 'dio',
+    'sonoff' : 'dout',
+}
+
+board_esptoolize_sizes = {
+    'nodemcu' : '4M',
+    'sonoff' : '1M',
+}
+
 esptoolize=[esptool,
   '-eo', esp8266_base+'/bootloaders/eboot/eboot.elf',
   '-bo', '@OUTPUT@',
-  '-bm', 'dio',
+  '-bm', board_esptoolize_flash_modes[get_option('boardtype')],
   '-bf', '40',
-  '-bz', '4M',
+  '-bz', board_esptoolize_sizes[get_option('boardtype')],
   '-bs', '.text',
   '-bp', '4096',
   '-ec',
