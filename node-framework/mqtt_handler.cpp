@@ -116,6 +116,8 @@ void mqtt_handler::update()
 }
 void mqtt_handler::handle_topic(const String& name, topic_handler handler)
 {
+    sp("Adding topic handler for ");
+    spl(name);
     handlers.push_back({name,handler,false});
     if(client.connected())
     {
