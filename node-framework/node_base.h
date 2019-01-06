@@ -28,11 +28,11 @@ public:
     String get_state_topic(const String& type, const int vnode=0);
     String get_action_topic(const String& type, const int vnode=0, const String& alt_suffix="");
 
+    mqtt_handler mqtt;
 protected:
     String device_id;
     wifi_connector wifi;
     updater_ota ota;
-    mqtt_handler mqtt;
     const float ticks_per_second=30.0f;
     unsigned long cycle_time_ms=(int)(1000/ticks_per_second);
     std::vector<ticker_component*> components;
