@@ -1,5 +1,5 @@
 // kate: hl C++;
-// vim: filetype=c++: 
+// vim: filetype=c++:
 
 #include "node_base.h"
 
