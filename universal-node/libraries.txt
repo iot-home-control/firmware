@@ -1,3 +1,0 @@
-NeoPixelBus
-pubsubclient-1.99.1
-DHT-sensor-library-1.1.1
