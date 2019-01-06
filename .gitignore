@@ -1,5 +1,7 @@
 config.h
 *.swp
+*.kate-swp
+*.bak
 build*/
 *.pro.user
 *.log
