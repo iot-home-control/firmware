@@ -71,6 +71,7 @@ License along with NeoPixel.  If not, see
 
 #elif defined(ARDUINO_ARCH_ESP32)
 
+#include "internal/NeoEsp32I2sMethod.h"
 #include "internal/NeoEspBitBangMethod.h"
 #include "internal/DotStarGenericMethod.h"
 
@@ -321,7 +322,14 @@ public:
         }
     }
     
+    void SwapPixelColor(uint16_t indexPixelOne, uint16_t indexPixelTwo)
+    {
+        auto colorOne = GetPixelColor(indexPixelOne);
+        auto colorTwo = GetPixelColor(indexPixelTwo);
 
+        SetPixelColor(indexPixelOne, colorTwo);
+        SetPixelColor(indexPixelTwo, colorOne);
+    };
  
 protected:
     const uint16_t _countPixels; // Number of RGB LEDs in strip

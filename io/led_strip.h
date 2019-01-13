@@ -19,7 +19,7 @@
     #error "No LED type"
 #endif
 
-typedef NeoPixelBus<LedFeatureType, NeoEsp8266Uart800KbpsMethod> led_type;
+typedef NeoPixelBus<LedFeatureType, NeoEsp8266Uart1800KbpsMethod> led_type;
 
 class led_strip: public ticker_component
 {
