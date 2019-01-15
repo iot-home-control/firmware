@@ -112,6 +112,10 @@ nodes = {
         'deps' : deps_wifi_indicator,
         'srcs' : srcs_wifi_indicator,
     },
+    'led_test': {
+        'deps' : deps_led_strip,
+        'srcs' : ['node_led_test.cpp'],
+    },
 }
 
 boardtype = get_option('boardtype')
