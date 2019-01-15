@@ -4,6 +4,7 @@
 #include "components/util.h"
 
 #include <NeoPixelBus.h>
+#include <Arduino.h>
 
 struct segment_t
 {
@@ -18,6 +19,11 @@ struct segment_t
     uint8_t length() const
     {
         return stop-start+1;
+    }
+
+    uint16_t random_pixel() const
+    {
+        return start + random(length());
     }
 };
 
@@ -39,9 +45,100 @@ struct segment_state_t
     }
 };
 
-typedef NeoPixelBus<NeoGrbFeature, NeoEsp8266Uart1800KbpsMethod> led_strip;
-typedef std::function<uint16_t(led_strip &leds, const segment_t &segment, segment_state_t &state)> PatternFunction;
-//typedef uint16_t (*PatternFunction)(led_strip &leds, const segment_t &segment, segment_state_t &state);
+class led_controller;
+
+typedef NeoPixelBus<NeoGrbFeature, NeoEsp8266Uart1800KbpsMethod> led_strip_t;
+typedef std::function<uint16_t(led_controller*, const segment_t &segment, segment_state_t &state)> PatternFunction;
+
+class led_controller: public ticker_component
+{
+public:
+    led_controller(const uint16_t num_leds);
+    void update();
+
+    static const uint8_t num_segments = 10;
+    segment_t segments[num_segments];
+    segment_state_t segment_states[num_segments];
+
+private:
+    uint16_t pattern_static(const segment_t &segment, segment_state_t &state);
+    uint16_t pattern_all_dynamic(const segment_t &segment, segment_state_t &state);
+    uint16_t pattern_single_dynamic(const segment_t &segment, segment_state_t &state);
+    uint16_t pattern_color_wipe(const segment_t &segment, segment_state_t &state);
+    uint16_t pattern_twinkle_fade(const segment_t &segment, segment_state_t &state);
+    uint16_t pattern_twinkle_fade_random(const segment_t &segment, segment_state_t &state);
+    uint16_t pattern_comet(const segment_t &segment, segment_state_t &state);
+    uint16_t pattern_fire_flicker(const segment_t &segment, segment_state_t &state);
+    uint16_t pattern_fire_flicker_soft(const segment_t &segment, segment_state_t &state);
+    uint16_t pattern_fire_flicker_intense(const segment_t &segment, segment_state_t &state);
+    uint16_t pattern_rainbow(const segment_t &segment, segment_state_t &state);
+    uint16_t pattern_sunrise(const segment_t &segment, segment_state_t &state);
+
+    PatternFunction patterns[12] = {
+        &led_controller::pattern_static,
+        &led_controller::pattern_all_dynamic,
+        &led_controller::pattern_single_dynamic,
+        &led_controller::pattern_color_wipe,
+        &led_controller::pattern_twinkle_fade,
+        &led_controller::pattern_twinkle_fade_random,
+        &led_controller::pattern_comet,
+        &led_controller::pattern_fire_flicker,
+        &led_controller::pattern_fire_flicker_soft,
+        &led_controller::pattern_fire_flicker_intense,
+        &led_controller::pattern_rainbow,
+        &led_controller::pattern_sunrise,
+    };
+
+    /*const char *pattern_names[] = {
+        F("Static"),
+        F("Random Color (All Pixels)"),
+        F("Random Color (Single Pixel)"),
+        F("Color Wipe"),
+        F("Twinkle (Static Color)"),
+        F("Twinkle (Random Color)"),
+        F("Comet"),
+        F("Fire Flicker"),
+        F("Fire Flicker (Soft)"),
+        F("Fire Flicker (Intense)"),
+        F("Rainbow"),
+        F("Sunrise"),
+    };*/
+
+    uint16_t num_leds;
+    led_strip_t leds;
+};
+
+led_controller::led_controller(const uint16_t num_leds): num_leds(num_leds), leds(num_leds)
+{
+    for(uint8_t i=0; i<num_segments; ++i)
+    {
+        segment_states[i].reset();
+    }
+
+    leds.Begin();
+    leds.ClearTo(HtmlColor(0x000000));
+    leds.Show();
+}
+
+void led_controller::update()
+{
+    bool do_show = false;
+    for(uint8_t i=0; i<num_segments; ++i)
+    {
+        const unsigned long now = millis();
+        const segment_t &segment = segments[i];
+        segment_state_t &state = segment_states[i];
+        if(now>state.next_call)
+        {
+            uint16_t delay = (patterns[segment.pattern])(this, segment, state);
+            state.call_counter++;
+            state.next_call = now+max(delay, uint16_t(33)/*(uint16_t)cycle_time_ms*/);
+            do_show = true;
+        }
+    }
+    if(do_show)
+        leds.Show();
+}
 
 RgbColor color_wheel(uint8_t pos)
 {
@@ -64,34 +161,7 @@ RgbColor color_wheel(uint8_t pos)
     return HtmlColor(ret_hex);
 }
 
-uint16_t mode_static(led_strip &leds, const segment_t &segment, segment_state_t &state)
-{
-    if(state.call_counter == 0)
-    {
-        for(uint16_t i=segment.start; i <= segment.stop; i++)
-        {
-            leds.SetPixelColor(i, segment.colors[0]);
-        }
-    }
-    return 1000;
-}
-
-uint16_t mode_single_dynamic(led_strip &leds, const segment_t &segment, segment_state_t &state)
-{
-    if(state.call_counter == 0)
-    {
-        for(uint16_t i=segment.start; i <= segment.stop; i++)
-        {
-            leds.SetPixelColor(i, color_wheel(random(256)));
-        }
-    }
-    RgbColor color = color_wheel(random(256));
-    const int offset = random(segment.length());
-    leds.SetPixelColor(segment.start + offset, color);
-    return segment.speed;
-}
-
-uint16_t color_wipe(led_strip &leds, const segment_t &segment, segment_state_t &state, RgbColor color1, RgbColor color2, bool rev)
+uint16_t color_wipe(led_strip_t &leds, const segment_t &segment, segment_state_t &state, RgbColor color1, RgbColor color2, bool rev)
 {
     const uint16_t length = segment.length();
     if(state.aux1 < length)
@@ -117,15 +187,7 @@ uint16_t color_wipe(led_strip &leds, const segment_t &segment, segment_state_t &
     return (segment.speed / (length * 2));
 }
 
-/*
-* Lights all LEDs one after another.
-*/
-uint16_t mode_color_wipe(led_strip &leds, const segment_t &segment, segment_state_t &state)
-{
-    return color_wipe(leds, segment, state, segment.colors[0], segment.colors[1], false);
-}
-
-void fade_out(led_strip &leds, const segment_t &segment)
+void fade_out(led_strip_t &leds, const segment_t &segment)
 {
     for(uint16_t i=segment.start; i<=segment.stop; ++i)
     {
@@ -135,92 +197,27 @@ void fade_out(led_strip &leds, const segment_t &segment)
     }
 }
 
-/*
-* twinkle_fade function
-*/
-uint16_t twinkle_fade(led_strip &leds, const segment_t &segment, segment_state_t &state, const RgbColor color) {
+uint16_t twinkle_fade(led_strip_t &leds, const segment_t &segment, segment_state_t &state, const RgbColor color)
+{
     fade_out(leds, segment);
 
     if(random(3) == 0)
     {
-        leds.SetPixelColor(segment.start+random(segment.length()), color);
+        leds.SetPixelColor(segment.random_pixel(), color);
     }
     return segment.speed/8;
 }
 
-/*
-* Blink several LEDs on, fading out.
-*/
-uint16_t mode_twinkle_fade(led_strip &leds, const segment_t &segment, segment_state_t &state)
-{
-    return twinkle_fade(leds, segment, state, segment.colors[0]);
-}
-
-uint16_t mode_twinkle_fade_random(led_strip &leds, const segment_t &segment, segment_state_t &state)
-{
-    return twinkle_fade(leds, segment, state, color_wheel(random(256)));
-}
-
-  /*
-  * Firing comets from one end.
-  */
-uint16_t mode_comet(led_strip &leds, const segment_t &segment, segment_state_t &state)
-{
-    fade_out(leds, segment);
-
-    if(segment.reverse)
-        leds.SetPixelColor(segment.stop - state.aux1, segment.colors[0]);
-    else
-        leds.SetPixelColor(segment.start + state.aux1, segment.colors[0]);
-
-    const uint16_t length = segment.length();
-    state.aux1 = (state.aux1 + 1) % length;
-    return (segment.speed / length);
-}
-
-/*
-* Fire flicker function
-*/
-uint16_t fire_flicker(led_strip &leds, const segment_t &segment, segment_state_t &state, int rev_intensity)
+uint16_t fire_flicker(led_strip_t &leds, const segment_t &segment, segment_state_t &state, int rev_intensity)
 {
     const RgbColor &col = segment.colors[0];
     const uint8_t lum = max(col.R, max(col.G, col.B)) / rev_intensity;
-    for(uint16_t i=segment.start; i <= segment.stop; i++) {
+    for(uint16_t i=segment.start; i <= segment.stop; i++)
+    {
         const uint8_t flicker = random(0, lum);
         leds.SetPixelColor(i, RgbColor(max(col.R - flicker, 0), max(col.G - flicker, 0), max(col.B - flicker, 0)));
     }
     return (segment.speed / segment.length());
-}
-
-/*
-* Random flickering.
-*/
-uint16_t mode_fire_flicker(led_strip &leds, const segment_t &segment, segment_state_t &state) {
-    return fire_flicker(leds, segment, state, 3);
-}
-
-/*
-* Random flickering, less intesity.
-*/
-uint16_t mode_fire_flicker_soft(led_strip &leds, const segment_t &segment, segment_state_t &state) {
-    return fire_flicker(leds, segment, state, 6);
-}
-
-/*
-* Random flickering, more intesity.
-*/
-uint16_t mode_fire_flicker_intense(led_strip &leds, const segment_t &segment, segment_state_t &state) {
-    return fire_flicker(leds, segment, state, 1);
-}
-
-uint16_t rainbow(led_strip &leds, const segment_t &segment, segment_state_t &state)
-{
-    for(uint16_t i=segment.start; i<=segment.stop; ++i)
-    {
-        leds.SetPixelColor(i, color_wheel((i*256/segment.length()+state.aux1)%256));
-    }
-    state.aux1 = (state.aux1+1)%256;
-    return segment.speed/segment.length();
 }
 
 RgbColor sunrise_color(int x)
@@ -262,7 +259,114 @@ RgbColor sunrise_color(int x)
     return RgbColor(r, g, b);
 }
 
-uint16_t mode_sunrise(led_strip &leds, const segment_t &segment, segment_state_t &state)
+uint16_t led_controller::pattern_static(const segment_t &segment, segment_state_t &state)
+{
+    if(state.call_counter == 0)
+    {
+        for(uint16_t i=segment.start; i <= segment.stop; i++)
+        {
+            leds.SetPixelColor(i, segment.colors[0]);
+        }
+    }
+    return 1000;
+}
+
+uint16_t led_controller::pattern_single_dynamic(const segment_t &segment, segment_state_t &state)
+{
+    if(state.call_counter == 0)
+    {
+        for(uint16_t i=segment.start; i <= segment.stop; i++)
+        {
+            leds.SetPixelColor(i, color_wheel(random(256)));
+        }
+    }
+    RgbColor color = color_wheel(random(256));
+    leds.SetPixelColor(segment.random_pixel(), color);
+    return segment.speed;
+}
+
+uint16_t led_controller::pattern_all_dynamic(const segment_t &segment, segment_state_t &state)
+{
+    for(uint16_t i=segment.start; i <= segment.stop; i++)
+    {
+        leds.SetPixelColor(i, color_wheel(random(256)));
+    }
+    return segment.speed;
+}
+
+/*
+* Lights all LEDs one after another.
+*/
+uint16_t led_controller::pattern_color_wipe(const segment_t &segment, segment_state_t &state)
+{
+    return color_wipe(leds, segment, state, segment.colors[0], segment.colors[1], false);
+}
+
+/*
+* Blink several LEDs on, fading out.
+*/
+uint16_t led_controller::pattern_twinkle_fade(const segment_t &segment, segment_state_t &state)
+{
+    return twinkle_fade(leds, segment, state, segment.colors[0]);
+}
+
+uint16_t led_controller::pattern_twinkle_fade_random(const segment_t &segment, segment_state_t &state)
+{
+    return twinkle_fade(leds, segment, state, color_wheel(random(256)));
+}
+
+/*
+* Firing comets from one end.
+*/
+uint16_t led_controller::pattern_comet(const segment_t &segment, segment_state_t &state)
+{
+    fade_out(leds, segment);
+
+    if(segment.reverse)
+        leds.SetPixelColor(segment.stop - state.aux1, segment.colors[0]);
+    else
+        leds.SetPixelColor(segment.start + state.aux1, segment.colors[0]);
+
+    const uint16_t length = segment.length();
+    state.aux1 = (state.aux1 + 1) % length;
+    return (segment.speed / length);
+}
+
+/*
+* Random flickering.
+*/
+uint16_t led_controller::pattern_fire_flicker(const segment_t &segment, segment_state_t &state)
+{
+    return fire_flicker(leds, segment, state, 3);
+}
+
+/*
+* Random flickering, less intesity.
+*/
+uint16_t led_controller::pattern_fire_flicker_soft(const segment_t &segment, segment_state_t &state)
+{
+    return fire_flicker(leds, segment, state, 6);
+}
+
+/*
+* Random flickering, more intesity.
+*/
+uint16_t led_controller::pattern_fire_flicker_intense(const segment_t &segment, segment_state_t &state)
+{
+    return fire_flicker(leds, segment, state, 1);
+}
+
+uint16_t led_controller::pattern_rainbow(const segment_t &segment, segment_state_t &state)
+{
+    for(uint16_t i=segment.start; i<=segment.stop; ++i)
+    {
+        leds.SetPixelColor(i, color_wheel((i*256/segment.length()+state.aux1)%256));
+    }
+    state.aux1 = (state.aux1+1)%256;
+    return segment.speed/segment.length();
+}
+
+uint16_t led_controller::pattern_sunrise(const segment_t &segment, segment_state_t &state)
 {
     const uint16_t length=segment.length();
     const bool even = length%2==0;
@@ -309,71 +413,34 @@ uint16_t mode_sunrise(led_strip &leds, const segment_t &segment, segment_state_t
     return delay;
 }
 
-const uint8_t num_segments = 2;
-
 class node_led_test: public node_base
 {
 public:
     void setup();
     void loop();
 private:
-    led_strip leds{15};
-    segment_t segments[num_segments];
-    segment_state_t segment_states[num_segments];
-    PatternFunction patterns[9] = {
-        &mode_static,
-        &mode_single_dynamic,
-        &mode_color_wipe,
-        &mode_twinkle_fade,
-        &mode_twinkle_fade_random,
-        &mode_comet,
-        &mode_fire_flicker_intense,
-        &rainbow,
-        &mode_sunrise,
-    };
+    led_controller leds{15};
 };
 
 void node_led_test::setup()
 {
     node_base::setup();
-    leds.Begin();
-    leds.ClearTo(HtmlColor(0x000000));
-    leds.Show();
 
-    for(uint8_t i=0; i<num_segments; ++i)
-    {
-        segment_states[i].reset();
-    }
-    segments[0].start=0;
-    segments[0].stop=10;
-    segments[0].pattern=8;
-    segments[0].speed=10;
+    leds.segments[0].start=0;
+    leds.segments[0].stop=10;
+    leds.segments[0].pattern=8;
+    leds.segments[0].speed=10;
 
-    segments[1].start=11;
-    segments[1].stop=14;
-    segments[1].pattern=4;
-    segments[1].speed=100;
+    leds.segments[1].start=11;
+    leds.segments[1].stop=14;
+    leds.segments[1].pattern=4;
+    leds.segments[1].speed=100;
 }
 
 void node_led_test::loop()
 {
     node_base::loop();
-    bool do_show = false;
-    for(uint8_t i=0; i<num_segments; ++i)
-    {
-        const unsigned long now = millis();
-        const segment_t &segment = segments[i];
-        segment_state_t &state = segment_states[i];
-        if(now>state.next_call)
-        {
-            uint16_t delay = (patterns[segment.pattern])(leds, segment, state);
-            state.call_counter++;
-            state.next_call = now+max(delay, (uint16_t)cycle_time_ms);
-            do_show = true;
-        }
-    }
-    if(do_show)
-        leds.Show();
+    leds.update();
     node_base::wait_for_loop_timing();
 }
 
