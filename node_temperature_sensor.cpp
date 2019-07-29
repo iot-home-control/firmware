@@ -34,9 +34,12 @@ void node_temperature_sensor::setup()
         int refresh_rate = 10;
         if(obj.containsKey("rate") && obj["rate"].is<int>())
             refresh_rate = obj["rate"].as<int>();
+        bool always_notify = false;
+        if(obj.containsKey("always_notify") && obj["always_notify"].is<bool>())
+            always_notify = obj["always_notify"].as<bool>();
         int pin = obj["pin"].as<int>();
         sensor_dht22 *sensor = new sensor_dht22();
-        sensor->begin(pin, refresh_rate*1000);
+        sensor->begin(pin, refresh_rate*1000, always_notify);
 
         sensor->on_temperature_changed=[this,vnode_id](const float v)
         {
@@ -65,10 +68,13 @@ void node_temperature_sensor::setup()
         int refresh_rate = 10;
         if(obj.containsKey("rate") && obj["rate"].is<int>())
             refresh_rate = obj["rate"].as<int>();
+        bool always_notify = false;
+        if(obj.containsKey("always_notify") && obj["always_notify"].is<bool>())
+            always_notify = obj["always_notify"].as<bool>();
         int pin = obj["pin"].as<int>();
 
         sensor_ds1820 *sensor = new sensor_ds1820();
-        sensor->begin(pin, refresh_rate*1000, vnode_id);
+        sensor->begin(pin, refresh_rate*1000, always_notify, vnode_id);
         sensor->on_temperature_changed=[this](const uint8_t index, const float v, const int vnode_offest)
         {
             Serial.print("Temperature on DS1820 #");

@@ -5,9 +5,10 @@ sensor_ds1820::sensor_ds1820(): prev_millis(0), vnode_offset(0)
 
 }
 
-void sensor_ds1820::begin(uint8_t pin, const unsigned long update_every_ms, const int vnode_offset)
+void sensor_ds1820::begin(uint8_t pin, const unsigned long update_every_ms, const bool always_notify, const int vnode_offset)
 {
     this->update_every_ms=update_every_ms;
+    this->always_notify=always_notify;
     this->vnode_offset=vnode_offset;
     onewire=new OneWire(pin);
     dtlib.setOneWire(onewire);
@@ -68,7 +69,7 @@ void sensor_ds1820::update()
         auto &addr=onewire_addresses.at(index);
         float temperature=dtlib.getTempC(addr.addr);
         float& last_temperature=last_temperatures.at(index);
-        if(temperature!=last_temperature && temperature!=-127.0)
+        if((temperature!=last_temperature || always_notify) && temperature!=-127.0)
         {
             last_temperature=temperature;
             if(on_temperature_changed)
