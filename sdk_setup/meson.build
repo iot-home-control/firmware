@@ -59,7 +59,7 @@ board_cross_link_args = {
         '-Teagle.flash.1m0.ld',
     ],
     'shelly' : [
-        '-Teagle.flash.4m.ld',
+        '-Teagle.flash.1m64.ld',
     ],
 }
 
