@@ -55,7 +55,7 @@ board_esptoolize_flash_modes = {
 board_esptoolize_sizes = {
     'nodemcu' : '4M',
     'sonoff' : '1M',
-    'shelly' : '4M',
+    'shelly' : '1M64',
 }
 
 esptoolize=[esptool,
