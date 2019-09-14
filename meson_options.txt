@@ -1,1 +1,1 @@
-option('boardtype', type : 'combo', choices : ['nodemcu', 'sonoff'], description : 'Select the board type to use')
+option('boardtype', type : 'combo', choices : ['nodemcu', 'sonoff', 'shelly'], description : 'Select the board type to use')

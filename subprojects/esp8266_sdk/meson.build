@@ -49,11 +49,13 @@ link_with: core_lib)
 board_esptoolize_flash_modes = {
     'nodemcu' : 'dio',
     'sonoff' : 'dout',
+    'shelly' : 'dout',
 }
 
 board_esptoolize_sizes = {
     'nodemcu' : '4M',
     'sonoff' : '1M',
+    'shelly' : '4M',
 }
 
 esptoolize=[esptool,

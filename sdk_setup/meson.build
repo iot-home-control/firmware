@@ -7,6 +7,9 @@ board_cross_args = {
     'sonoff' : [
         '-DARDUINO_ESP8266_ESP01',
     ],
+    'shelly' : [
+        '-DARDUINO_ESP8266_GENERIC',
+    ],
 }
 
 common_cross_args = [
@@ -54,6 +57,9 @@ board_cross_link_args = {
     ],
     'sonoff' : [
         '-Teagle.flash.1m0.ld',
+    ],
+    'shelly' : [
+        '-Teagle.flash.4m.ld',
     ],
 }
 
