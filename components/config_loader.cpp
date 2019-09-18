@@ -116,7 +116,7 @@ bool config_loader::check(const String &device_id, const String &config_server) 
 {
     const bool NO_REBOOT = false, DO_REBOOT = true;
     HTTPClient http;
-    http.setTimeout(500/*ms*/);
+    http.setTimeout(2000/*ms*/);
     http.begin(config_server+F("/api/v1/config?device=")+device_id);
     int rc = http.GET();
     if(rc!=HTTP_CODE_OK)
@@ -127,10 +127,10 @@ bool config_loader::check(const String &device_id, const String &config_server) 
             LOGF("[cl] http error: %i\n", rc);
         return NO_REBOOT;
     }
-    
+
     DynamicJsonBuffer jsonBuffer;
     const auto& config = jsonBuffer.parseObject(http.getStream());
-    
+
     if(!config.success())
     {
         LOGLN("[cl] Could not parse downloaded config.json");
