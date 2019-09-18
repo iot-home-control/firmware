@@ -19,7 +19,7 @@ subdir('ld')
 
 core_lib = static_library('ESP8266Core', esp8266_src, include_directories: esp8266_include)
 core=declare_dependency(include_directories: esp8266_include,
-sources: [customize_sdk_4m, customize_sdk_1m0],
+sources: [customize_sdk_4m, customize_sdk_1m0, customize_sdk_1m64],
 dependencies: [
     compiler.find_library('m', dirs: search_dirs),
     compiler.find_library('gcc', dirs: search_dirs),
