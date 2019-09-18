@@ -35,6 +35,9 @@ void node_power_switch::setup()
         char relay_pin = -1;
         char led_pin = -1;
         char button_pin = -1;
+        bool button_pullup = true;
+        char toggle_pin = -1;
+        bool toggle_pullup = true;
 
         if(!obj.containsKey("relay_pin") || !obj["relay_pin"].is<int>())
         {
@@ -58,8 +61,15 @@ void node_power_switch::setup()
             led_pin = obj["led_pin"].as<int>();
         if(obj.containsKey("button_pin") && obj["button_pin"].is<int>())
             button_pin = obj["button_pin"].as<int>();
+        if(obj.containsKey("button_pullup") && obj["button_pullup"].is<bool>())
+            button_pullup = obj["button_pullup"].as<bool>();
+        if(obj.containsKey("toggle_pin") && obj["toggle_pin"].is<int>())
+            toggle_pin = obj["toggle_pin"].as<int>();
+        if(obj.containsKey("toggle_pullup") && obj["toggle_pullup"].is<bool>())
+            toggle_pullup = obj["toggle_pullup"].as<bool>();
 
-        r->begin(this, vnode_id, relay_pin, led_pin, button_pin, start_on, invert_relay, invert_led);
+
+        r->begin(this, vnode_id, relay_pin, led_pin, button_pin, button_pullup, toggle_pin, toggle_pullup, start_on, invert_relay, invert_led);
 
         return r;
     });

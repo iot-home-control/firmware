@@ -68,6 +68,7 @@ deps_power_switch = [
 srcs_power_switch = [
     'node_power_switch.cpp',
     'io/button.cpp',
+    'io/toggle_switch.cpp',
     'io/gpio_pin.cpp',
     'io/relay.cpp',
 ]
