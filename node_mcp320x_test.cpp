@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <functional>
+#include <Mcp320x.h>
 
 #include "io/gpio_pin.h"
 #include "io/feedback_button.h"
