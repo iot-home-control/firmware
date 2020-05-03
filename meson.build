@@ -126,7 +126,7 @@ nodes = {
     },
     'mcp320x_test': {
         'deps': deps_mcp320x,
-        'srcs': ['node_mcp320x_test.cpp'],
+        'srcs': ['io/gpio_pin.cpp', 'node_mcp320x_test.cpp'],
     },
 }
 

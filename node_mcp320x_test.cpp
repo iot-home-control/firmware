@@ -17,11 +17,10 @@ public:
 private:
     
     #define SPI_CS 16
-    gpio spi_cs; // SPI slave select 16
-    auto adc_vref = 3300; // 3.3V Vref
-    auto ac_clk = 100000; // SPI clock 1.6MHz*/
-    
-    MCP3208 adc(adc_vref, SPI_CS);
+    gpio_pin spi_cs; // SPI slave select 16
+    uint16_t adc_vref = 3300; // 3.3V Vref
+    int adc_clk = 100000; // SPI clock 1.6MHz*/
+    MCP3208 adc{adc_vref, SPI_CS};
 
 };
 
