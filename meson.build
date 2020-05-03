@@ -14,6 +14,7 @@ OneWire=subproject('OneWire')
 ArduinoTemperatureControlLibrary=subproject('ArduinoTemperatureControlLibrary')
 Adafruit_GFX_Library=subproject('Adafruit_GFX_Library')
 Adafruit_PCD8544_Nokia_5110_LCD_library=subproject('Adafruit_PCD8544_Nokia_5110_LCD_library')
+MCP320x=subproject('Mcp320x')
 
 deps_base = [
     sdk.get_variable('core'),
@@ -92,6 +93,12 @@ srcs_wifi_indicator = [
     'node_wifi_indicator.cpp',
 ]
 
+deps_mcp320x = [
+    arduino.get_variable('SPI'),
+    MCP320x.get_variable('lib'),
+]
+
+
 nodes = {
     'led_strip' : {
         'deps' : deps_led_strip,
@@ -116,6 +123,10 @@ nodes = {
     'led_test': {
         'deps' : deps_led_strip,
         'srcs' : ['node_led_test.cpp'],
+    },
+    'mcp320x_test': {
+        'deps': deps_mcp320x,
+        'srcs': ['node_mcp320x_test.cpp'],
     },
 }
 

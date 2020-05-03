@@ -7,3 +7,4 @@ Arduino-Temperature-Control-Library: https://github.com/milesburton/Arduino-Temp
 Adafruit_PCD8544_Nokia_5110_LCD_library: Use fork from https://github.com/WereCatf/Adafruit-PCD8544-Nokia-5110-LCD-library
 Adafruit_GFX_Library: https://github.com/adafruit/Adafruit-GFX-Library
 BMP180: https://github.com/sparkfun/BMP180_Breakout_Arduino_Library/archive/V_1.1.2.zip
+MCP320x: https://github.com/labfruits/mcp320x
