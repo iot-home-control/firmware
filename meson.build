@@ -98,6 +98,11 @@ deps_mcp320x = [
     MCP320x.get_variable('lib'),
 ]
 
+srcs_mcp320x = [
+    'io/gpio_pin.cpp',
+    'io/sensor_mcp320x.cpp',
+    'node_mcp320x_test.cpp'
+]
 
 nodes = {
     'led_strip' : {
@@ -126,7 +131,7 @@ nodes = {
     },
     'mcp320x_test': {
         'deps': deps_mcp320x,
-        'srcs': ['io/gpio_pin.cpp', 'node_mcp320x_test.cpp'],
+        'srcs': srcs_mcp320x,
     },
 }
 

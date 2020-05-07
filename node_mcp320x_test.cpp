@@ -2,10 +2,9 @@
 
 #include <memory>
 #include <functional>
-#include <Mcp320x.h>
 
+#include "io/sensor_mcp320x.h"
 #include "io/gpio_pin.h"
-#include "io/feedback_button.h"
 
 class node_mcp320x_test: public node_base
 {
@@ -13,14 +12,14 @@ public:
     node_mcp320x_test();
 
     void setup();
-    void loop();
+
 private:
     
     #define SPI_CS 16
     gpio_pin spi_cs; // SPI slave select 16
     uint16_t adc_vref = 3300; // 3.3V Vref
     int adc_clk = 100000; // SPI clock 1.6MHz*/
-    MCP3208 adc{adc_vref, SPI_CS};
+    sensor_mcp320x<8> mcp;
 
 };
 
@@ -33,43 +32,18 @@ void node_mcp320x_test::setup()
 {
     node_base::setup();
     spi_cs.begin(SPI_CS,  gpio_pin::pin_out);
-    components.push_back(&spi_cs);
     SPISettings settings(adc_clk, MSBFIRST, SPI_MODE0);
     SPI.begin();
     SPI.beginTransaction(settings);
+    mcp.on_value_changed = [this] (char channel, uint16_t raw, uint16_t analog) {
+        mqtt.publish(get_state_topic("soil-humidity", channel),"local,"+String(analog));
+        Serial.printf("Channel %d: raw %d analog %d\n", channel, raw, analog);
+    };
+    mcp.begin(SPI_CS, adc_vref, 2, 30000, true);
+
+    components.push_back(&mcp);
 }
 
-void node_mcp320x_test::loop()
-{
-    node_base::loop();
-    uint32_t t1;
-    uint32_t t2;
-
-    // start sampling
-    Serial.println("Reading...");
-    spi_cs.write(HIGH);
-
-    t1 = micros();
-    uint16_t raw = adc.read(MCP3208::Channel::SINGLE_0);
-    t2 = micros();
-
-    // get analog value
-    uint16_t val = adc.toAnalog(raw);
-
-    // readed value
-    Serial.print("value: ");
-    Serial.print(raw);
-    Serial.print(" (");
-    Serial.print(val);
-    Serial.println(" mV)");
-
-    // sampling time
-    Serial.print("Sampling time: ");
-    Serial.print(static_cast<double>(t2 - t1) / 1000, 4);
-    Serial.println("ms");
-    
-    spi_cs.write(LOW);
-}
 
 
 //mqtt.publish("/switch/"+client_id+"/state","local,reboot");
