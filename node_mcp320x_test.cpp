@@ -36,7 +36,7 @@ void node_mcp320x_test::setup()
     SPI.begin();
     SPI.beginTransaction(settings);
     mcp.on_value_changed = [this] (char channel, uint16_t raw, uint16_t analog) {
-        float soil_moisture = (float) analog / 4096 * 100;
+        float soil_moisture = (1 -(float) analog / 4096) * 100;
         mqtt.publish(get_state_topic("soilmoisture", channel),"local,"+String(soil_moisture));
         Serial.printf("Channel %d: raw %d analog %d\n", channel, raw, analog);
     };
