@@ -117,6 +117,7 @@ bool config_loader::check(const String &device_id, const String &config_server) 
     const bool NO_REBOOT = false, DO_REBOOT = true;
     HTTPClient http;
     http.setTimeout(2000/*ms*/);
+    http.useHTTP10(true);
     http.begin(config_server+F("/api/v1/config?device=")+device_id);
     int rc = http.GET();
     if(rc!=HTTP_CODE_OK)
