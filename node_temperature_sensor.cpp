@@ -5,6 +5,7 @@
 
 #include "io/sensor_ds1820.h"
 #include "io/sensor_dht22.h"
+#include "io/sensor_bmp180.h"
 #include "components/config_loader.h"
 #include <ArduinoJson.h>
 
@@ -82,6 +83,41 @@ void node_temperature_sensor::setup()
             Serial.print(" ");
             Serial.println(v);
             mqtt.publish(get_state_topic("temperature",vnode_offest+index),"local,"+String(v));
+        };
+
+        return sensor;
+    });
+
+    loader.install_factory("bmp180", 0, [this](const JsonObject &obj, int vnode_id) -> ticker_component*
+    {
+        int refresh_rate = 10;
+        if(obj.containsKey("rate") && obj["rate"].is<int>())
+            refresh_rate = obj["rate"].as<int>();
+        bool always_notify = false;
+        if(obj.containsKey("always_notify") && obj["always_notify"].is<bool>())
+            always_notify = obj["always_notify"].as<bool>();
+        float altitude = NAN;
+        if(obj.containsKey("altitude") && obj["altitude"].is<double>())
+            altitude = obj["altitude"].as<double>();
+
+        sensor_bmp180 *sensor = new sensor_bmp180();
+        sensor->begin(refresh_rate*1000, always_notify, altitude);
+        sensor->on_temperature_changed = [this, vnode_id](const float value)
+        {
+            Serial.printf("BMP180 #%d Temperature changed: ", vnode_id);
+            Serial.print(value);
+            Serial.println(" °C");
+            mqtt.publish(get_state_topic("temperature", vnode_id),"local,"+String(value));
+        };
+
+        sensor->on_pressure_changed = [this, vnode_id](const float absolute, const float sea_level)
+        {
+            Serial.printf("BMP180 #%d Pressure changed: ", vnode_id);
+            Serial.print(absolute);
+            Serial.print("mbar (sea-level: ");
+            Serial.print(sea_level);
+            Serial.println("mbar)");
+            mqtt.publish(get_state_topic("pressure", vnode_id),"local,"+String(sea_level));
         };
 
         return sensor;

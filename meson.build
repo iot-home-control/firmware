@@ -2,6 +2,7 @@ project('node-framework', 'cpp', default_options: ['buildtype=minsize'])
 subdir('sdk_setup')
 
 add_global_arguments(['-Wno-non-virtual-dtor'], language: 'cpp')
+#add_global_arguments(['-DDEBUG_ESP_PORT=Serial', '-DDEBUG_ESP_WIFI', '-DDEBUG_ESP_CORE'], language: 'cpp')
 
 sdk=subproject('esp8266_sdk')
 arduino=subproject('esp8266_arduino')
@@ -15,6 +16,7 @@ ArduinoTemperatureControlLibrary=subproject('ArduinoTemperatureControlLibrary')
 Adafruit_GFX_Library=subproject('Adafruit_GFX_Library')
 Adafruit_PCD8544_Nokia_5110_LCD_library=subproject('Adafruit_PCD8544_Nokia_5110_LCD_library')
 MCP320x=subproject('Mcp320x')
+BMP180=subproject('BMP180')
 
 deps_base = [
     sdk.get_variable('core'),
@@ -55,12 +57,14 @@ deps_temperature_sensor = [
     DHTSensorLibrary.get_variable('lib'),
     OneWire.get_variable('lib'),
     ArduinoTemperatureControlLibrary.get_variable('lib'),
+    BMP180.get_variable('lib'),
 ]
 
 srcs_temperature_sensor = [
     'node_temperature_sensor.cpp',
     'io/sensor_dht22.cpp',
     'io/sensor_ds1820.cpp',
+    'io/sensor_bmp180.cpp',
 ]
 
 deps_power_switch = [
