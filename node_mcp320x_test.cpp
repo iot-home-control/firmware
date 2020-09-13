@@ -40,7 +40,7 @@ void node_mcp320x_test::setup()
         mqtt.publish(get_state_topic("soilmoisture", channel),"local,"+String(soil_moisture));
         Serial.printf("Channel %d: raw %d analog %d\n", channel, raw, analog);
     };
-    mcp.begin(SPI_CS, adc_vref, 3, 30000, true);
+    mcp.begin(SPI_CS, adc_vref, 3, 15*60*1000, true); //every 15 minutes
 
     components.push_back(&mcp);
 }
