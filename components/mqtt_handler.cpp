@@ -105,6 +105,8 @@ void mqtt_handler::update()
 
             if(on_connected)
                 on_connected();
+
+            connection_retry_count = 0;
         }
         if(now-last_subscription_check>subscription_check_interval)
         {
