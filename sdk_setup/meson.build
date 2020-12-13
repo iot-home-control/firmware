@@ -56,7 +56,7 @@ board_cross_link_args = {
         '-Teagle.flash.4m.ld',
     ],
     'sonoff' : [
-        '-Teagle.flash.1m0.ld',
+        '-Teagle.flash.1m64.ld',
     ],
     'shelly' : [
         '-Teagle.flash.1m64.ld',
