@@ -23,6 +23,7 @@ deps_base = [
     arduino.get_variable('ESP8266WiFi'),
     arduino.get_variable('ArduinoOTA'),
     arduino.get_variable('ESP8266mDNS'),
+    arduino.get_variable('ESP8266WebServer'),
     PubSubClient.get_variable('lib'),
     arduino.get_variable('ESP8266HTTPClient'),
     ArduinoJson.get_variable('lib'),

@@ -44,6 +44,13 @@ ESP8266HTTPClient_includes = include_directories([library_base+'/ESP8266HTTPClie
 ESP8266HTTPClient_lib = static_library('ESP8266HTTPClient', ESP8266HTTPClient_src, dependencies: [core, ESP8266WiFi], include_directories: ESP8266HTTPClient_includes)
 ESP8266HTTPClient = declare_dependency(include_directories: ESP8266HTTPClient_includes, link_with: ESP8266HTTPClient_lib)
 
+ESP8266WebServer_src = []
+foreach s: ['detail/mimetable.cpp', 'ESP8266WebServer.cpp', 'ESP8266WebServerSecureAxTLS.cpp', 'ESP8266WebServerSecureBearSSL.cpp', 'Parsing.cpp']
+  ESP8266WebServer_src += library_base+'/ESP8266WebServer/src/'+s
+endforeach
+ESP8266WebServer_includes = include_directories([library_base+'/ESP8266WebServer/src/'])
+ESP8266WebServer_lib = static_library('ESP8266WebServer', ESP8266WebServer_src, dependencies: [core, ESP8266WiFi], include_directories: ESP8266WebServer_includes)
+ESP8266WebServer = declare_dependency(include_directories: ESP8266WebServer_includes, link_with: ESP8266WebServer_lib)
 
 ESP8266httpUpdate_src = []
 foreach s: ['ESP8266httpUpdate.cpp']

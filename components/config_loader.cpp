@@ -112,6 +112,30 @@ void config_loader::begin(std::vector<ticker_component*> &components, bool skip_
     config_file.close();
 }
 
+String config_loader::dump()
+{
+    if(!SPIFFS.begin())
+    {
+        LOGLN("[cl] Can't mount SPIFFS.");
+        return "cant-mount-spiffs";
+    }
+    have_config_json = SPIFFS.exists("/config.json");
+    if(!have_config_json)
+    {
+        LOGLN("[cl] /config.json does not exist.");
+        return "no-config";
+    }
+    File config_file = SPIFFS.open("/config.json", "r");
+    if(!config_file)
+    {
+        LOGLN("[cl] Can't open /config.json.");
+        return "cant-read-config";
+    }
+    String s = config_file.readString();
+    config_file.close();
+    return s;
+}
+
 bool config_loader::check(const String &device_id, const String &config_server) const
 {
     const bool NO_REBOOT = false, DO_REBOOT = true;

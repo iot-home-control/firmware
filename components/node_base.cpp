@@ -47,6 +47,13 @@ void node_base::setup() {
 
     message_poster.begin(&mqtt, "alive", device_id, 60000);
     components.push_back(&message_poster);
+
+    webserver.begin(80);
+    webserver.on("/reboot", []{
+        webserver.send(200, "text/plain", "Ok");
+        delay(100);
+        ESP.reset();
+    });
 }
 
 void node_base::loop() {
@@ -58,6 +65,7 @@ void node_base::loop() {
     {
         component->update();
     }
+    webserver.handleClient();
 }
 
 void node_base::wait_for_loop_timing()

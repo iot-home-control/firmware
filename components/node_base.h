@@ -6,6 +6,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 #include <ESP8266mDNS.h>
+#include <ESP8266WebServer.h>
 
 #include "config.h"
 #include "wifi_connector.h"
@@ -33,6 +34,7 @@ protected:
     String device_id;
     wifi_connector wifi;
     updater_ota ota;
+    ESP8266WebServer webserver;
     const float ticks_per_second=30.0f;
     unsigned long cycle_time_ms=(int)(1000/ticks_per_second);
     std::vector<ticker_component*> components;

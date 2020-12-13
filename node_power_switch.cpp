@@ -75,6 +75,11 @@ void node_power_switch::setup()
     });
 
     loader.begin(components, digitalRead(0)==LOW);
+
+    webserver.on("/config", [this]
+    {
+        webserver.send(200, "application/json", loader.dump());
+    });
 }
 
 void node_power_switch::loop()
