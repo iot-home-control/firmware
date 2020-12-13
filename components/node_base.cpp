@@ -45,7 +45,7 @@ void node_base::setup() {
     mqtt.on_connected=std::bind(&node_base::on_mqtt_connected, this);
     mqtt.on_disconnected=std::bind(&node_base::on_mqtt_disconnected, this);
 
-    message_poster.begin(&mqtt, "/alive", device_id, 60000);
+    message_poster.begin(&mqtt, "alive", device_id, 60000);
     components.push_back(&message_poster);
 }
 
@@ -69,12 +69,12 @@ void node_base::wait_for_loop_timing()
 
 String node_base::get_state_topic(const String &type, const int vnode)
 {
-    return "/"+type+"/"+device_id+"-"+vnode+"/state";
+    return type+"/"+device_id+"-"+vnode+"/state";
 }
 
 String node_base::get_action_topic(const String &type, const int vnode, const String &alt_suffix)
 {
-    String base = "/"+type+"/"+device_id+"-"+vnode;
+    String base = type+"/"+device_id+"-"+vnode;
     if(alt_suffix=="")
     {
         return base+"/action";
