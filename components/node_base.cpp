@@ -49,7 +49,7 @@ void node_base::setup() {
     components.push_back(&message_poster);
 
     webserver.begin(80);
-    webserver.on("/reboot", [=]{
+    webserver.on("/reboot", [this]{
         webserver.send(200, "text/plain", "Ok");
         delay(100);
         ESP.reset();
