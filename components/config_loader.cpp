@@ -48,7 +48,7 @@ void config_loader::begin(std::vector<ticker_component*> &components, bool skip_
         LOGLN("[cl] Could not parse /config.json.");
         return;
     }
-    
+
     if(!config.containsKey("version"))
     {
         LOGLN("[cl] Can't get version of existing config file");
