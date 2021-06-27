@@ -42,19 +42,21 @@ private:
     unsigned char active_channels;
 
     unsigned long prev_millis, update_every_ms;
-    
+
     uint16_t last_value[n];
     bool always_notify;
 public:
     typedef std::function<void(const char, const uint16_t, const uint16_t)> callback;
-    
-    sensor_mcp320x<n>(): sensor(nullptr), prev_millis(0) { }
+
+    sensor_mcp320x<n>(): sensor(nullptr), prev_millis(0) { global_spi_init(); }
     void begin(unsigned char pin, uint16_t vref, unsigned char active_channels, unsigned long update_every_ms, const bool always_notify=false);
     void update() override;
     uint16_t get_value(const unsigned char idx);
     unsigned char get_active_channels() const;
-    
+
     callback on_value_changed;
+
+    static void global_spi_init();
 
 
 };

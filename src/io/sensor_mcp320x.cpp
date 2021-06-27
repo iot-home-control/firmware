@@ -24,7 +24,7 @@ void sensor_mcp320x<n>::update()
         prev_millis=curr_millis;
         if(!sensor)
             return;
-        
+
         for(int i = 0; i<active_channels; i++)
         {
             int channel = i;
@@ -50,8 +50,6 @@ template void sensor_mcp320x<2>::update();
 template void sensor_mcp320x<4>::update();
 template void sensor_mcp320x<8>::update();
 
-
-
 template <int n>
 uint16_t sensor_mcp320x<n>::get_value(const unsigned char idx)
 {
@@ -62,3 +60,26 @@ template uint16_t sensor_mcp320x<1>::get_value(const unsigned char idx);
 template uint16_t sensor_mcp320x<2>::get_value(const unsigned char idx);
 template uint16_t sensor_mcp320x<4>::get_value(const unsigned char idx);
 template uint16_t sensor_mcp320x<8>::get_value(const unsigned char idx);
+
+static bool global_spi_init_done=false;
+static void do_global_spi_init()
+{
+    if(global_spi_init_done)
+        return;
+    global_spi_init_done = true;
+
+    constexpr int adc_clk = 100000; // SPI clock 1.6MHz
+    SPISettings settings(adc_clk, MSBFIRST, SPI_MODE0);
+    SPI.begin();
+    SPI.beginTransaction(settings);
+}
+
+template <int n>
+void sensor_mcp320x<n>::global_spi_init()
+{
+    do_global_spi_init();
+}
+template void sensor_mcp320x<1>::global_spi_init();
+template void sensor_mcp320x<2>::global_spi_init();
+template void sensor_mcp320x<4>::global_spi_init();
+template void sensor_mcp320x<8>::global_spi_init();
