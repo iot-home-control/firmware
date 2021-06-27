@@ -7,3 +7,4 @@ build*/
 *.log
 *.pro
 upload_aliases.json
+.pio/

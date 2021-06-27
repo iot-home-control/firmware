@@ -14,7 +14,7 @@ public:
     void setup();
     void loop();
 private:
-    button btn;
+    feedback_button btn;
 
     gpio_pin pin_relay;
     gpio_pin pin_led;
