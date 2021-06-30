@@ -3,11 +3,13 @@
 
 #include "components/node_base.h"
 
+#if defined(SUPPORT_SENSORS)
 #include "io/sensor_ds1820.h"
 #include "io/sensor_dht22.h"
 #include "io/sensor_bmp180.h"
-#include "io/relay.h"
 #include "io/sensor_mcp320x.h"
+#endif
+#include "io/relay.h"
 #include "io/gpio_pin.h"
 #include "components/config_loader.h"
 #include <ArduinoJson.h>
@@ -28,6 +30,7 @@ void node::setup()
 
     pinMode(0, INPUT_PULLUP);
 
+#if defined(SUPPORT_SENSORS)
     loader.install_factory("dht22", 0, [this](const JsonObject &obj, int vnode_id) -> ticker_component*
     {
         if(!obj.containsKey("pin") || !obj["pin"].is<int>())
@@ -126,6 +129,42 @@ void node::setup()
         return sensor;
     });
 
+    loader.install_factory("mcp3208", 0, [this](const JsonObject &obj, int vnode_id) -> ticker_component*
+    {
+        int cs_pin = -1;
+        int refresh_rate = 15*60;
+        bool always_notify = false;
+
+        if(obj.containsKey("cs_pin") && obj["cs_pin"].is<int>())
+        {
+            cs_pin = obj["cs_pin"].as<int>();
+        }
+        else
+        {
+            Serial.println("Can't create MCP3208. No CS Pin set.");
+            return nullptr;
+        }
+        if(obj.containsKey("rate") && obj["rate"].is<int>())
+            refresh_rate = obj["rate"].as<int>();
+        if(obj.containsKey("always_notify") && obj["always_notify"].is<bool>())
+            always_notify = obj["always_notify"].as<bool>();
+
+        gpio_pin *cs_gpio = new gpio_pin();
+        cs_gpio->begin(cs_pin, gpio_pin::pin_out);
+
+        const uint16_t adc_vref = 3300; // 3.3V Vref;
+        sensor_mcp320x<8> *mcp = new sensor_mcp320x<8>();
+        mcp->on_value_changed = [this] (char channel, uint16_t raw, uint16_t analog) {
+            float soil_moisture = (1 - (float)analog / 4096) * 100;
+            mqtt.publish(get_state_topic("soilmoisture", channel),"local,"+String(soil_moisture));
+            Serial.printf("Channel %d: raw %d analog %d\n", channel, raw, analog);
+        };
+        mcp->begin(cs_pin, adc_vref, 3, refresh_rate*1000, always_notify);
+
+        return mcp;
+    });
+#endif
+
     loader.install_factory("switch", 0, [this](const JsonObject &obj, int vnode_id) -> ticker_component*
     {
         bool invert_relay = false;
@@ -171,41 +210,6 @@ void node::setup()
         r->begin(this, vnode_id, relay_pin, led_pin, button_pin, button_pullup, toggle_pin, toggle_pullup, start_on, invert_relay, invert_led);
 
         return r;
-    });
-
-    loader.install_factory("mcp3208", 0, [this](const JsonObject &obj, int vnode_id) -> ticker_component*
-    {
-        int cs_pin = -1;
-        int refresh_rate = 15*60;
-        bool always_notify = false;
-
-        if(obj.containsKey("cs_pin") && obj["cs_pin"].is<int>())
-        {
-            cs_pin = obj["cs_pin"].as<int>();
-        }
-        else
-        {
-            Serial.println("Can't create MCP3208. No CS Pin set.");
-            return nullptr;
-        }
-        if(obj.containsKey("rate") && obj["rate"].is<int>())
-            refresh_rate = obj["rate"].as<int>();
-        if(obj.containsKey("always_notify") && obj["always_notify"].is<bool>())
-            always_notify = obj["always_notify"].as<bool>();
-
-        gpio_pin *cs_gpio = new gpio_pin();
-        cs_gpio->begin(cs_pin, gpio_pin::pin_out);
-
-        const uint16_t adc_vref = 3300; // 3.3V Vref;
-        sensor_mcp320x<8> *mcp = new sensor_mcp320x<8>();
-        mcp->on_value_changed = [this] (char channel, uint16_t raw, uint16_t analog) {
-            float soil_moisture = (1 - (float)analog / 4096) * 100;
-            mqtt.publish(get_state_topic("soilmoisture", channel),"local,"+String(soil_moisture));
-            Serial.printf("Channel %d: raw %d analog %d\n", channel, raw, analog);
-        };
-        mcp->begin(cs_pin, adc_vref, 3, refresh_rate*1000, always_notify);
-
-        return mcp;
     });
 
     loader.begin(components, digitalRead(0)==LOW);
