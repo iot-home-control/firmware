@@ -1,15 +1,16 @@
 #!/bin/bash
 
 set -e
-
-TOOL_ROOT="../../esp8266-sdk/tools"
-ESP_TOOL="$TOOL_ROOT/esptool/esptool"
+#TODO: use esptool.py
+TOOL_ROOT="$HOME/.platformio/packages/framework-arduinoespressif8266/tools"
+#ESP_TOOL="$TOOL_ROOT/esptool/esptool"
+ESP_TOOL="$HOME/.platformio/packages/tool-esptool/esptool"
 OTA_TOOL="$TOOL_ROOT/espota.py"
 
 function usage()
 {
-    echo "Usage: $0 <FILE> serial <PORT> [BAUD]"
-    echo "       $0 <FILE> ota <NAME> [PASS] [-p PORT]"
+    echo "Usage: $0 <BOARD> serial  <PORT> [BAUD]"
+    echo "       $0 <BOARD> ota <NAME> [PASS] [-p PORT]"
     exit 1
 }
 
@@ -17,7 +18,7 @@ if [ "$#" -lt 1 ]; then
     usage
 fi
 
-FILE="build/$1.bin"
+FILE=".pio/build/$1/firmware.bin"
 if [ ! -e "$FILE" ]; then
     usage
 else
