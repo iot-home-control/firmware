@@ -31,13 +31,18 @@ if [ "$1" == "serial" ]; then
     shift
     PORT="${1:-/dev/ttyUSB0}"
     BAUD="${2:-115200}"
-    $ESP_TOOL -cd nodemcu -cp $PORT -cb $BAUD -ca 0x0000 -cf "$FILE"
+    $ESP_TOOL -cd nodemcu -cp "$PORT" -cb "$BAUD" -ca 0x0000 -cf "$FILE"
 elif [ "$1" == "ota" ]; then
     shift
     HOSTNAME="$1"
 
-    if [[ -n "$(which jq)" && -f "upload_aliases.json" ]]; then
-        MAYBE_HOSTNAME=$(jq --raw-output ".\"${HOSTNAME}\"" upload_aliases.json)
+    if [[ -f "upload_aliases.json" ]]; then
+        MAYBE_HOSTNAME=$(python3 -c '
+import json, sys
+with open("upload_aliases.json", "r") as f:
+    d = json.load(f)
+    print(d.get(sys.argv[1], "null"))
+' "$HOSTNAME")
         if [[ "$MAYBE_HOSTNAME" != "null" ]]; then
             echo "$HOSTNAME is aliased to $MAYBE_HOSTNAME"
             HOSTNAME=$MAYBE_HOSTNAME
@@ -51,9 +56,19 @@ elif [ "$1" == "ota" ]; then
     else
         ARGS="$ARGS -p 8266"
     fi
-#    python $OTA_TOOL -d -i $(avahi-resolve-host-name -4 "${1}.local" | cut -f2) $ARGS -f "$FILE"
-     python $OTA_TOOL -d -i $(dig +short ${HOSTNAME})  $ARGS -f "$FILE"
-#    python $OTA_TOOL -d -i 10.42.0.197 $ARGS -f "$FILE"
+    IP=$(python3 -c '
+import ipaddress, socket, sys
+try:
+    print(str(ipaddress.ip_address(sys.argv[1])))
+except ValueError:
+    try:
+        print(socket.gethostbyname(sys.argv[1]))
+    except socket.gaierror:
+        print(sys.argv[1])
+' "$HOSTNAME")
+    # shellcheck disable=SC2086
+    echo python3 "$OTA_TOOL" -d -i "$IP" $ARGS -f "$FILE"
+    python3 "$OTA_TOOL" -d -i "$IP" $ARGS -f "$FILE"
 else
     usage
 fi
