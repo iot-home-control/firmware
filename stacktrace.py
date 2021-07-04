@@ -7,7 +7,7 @@ import sys
 
 if __name__=="__main__":
     addr2line="../../esp8266-sdk/tools/xtensa-lx106-elf/bin/xtensa-lx106-elf-addr2line"
-    elf="./build/{}.elf".format(sys.argv[1])
+    elf=".pio/build/{}/firmware.elf".format(sys.argv[1])
     
     regex = re.compile("(40[0-2][0-9a-f]{5}\\b)")
     
