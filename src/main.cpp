@@ -191,7 +191,7 @@ void node::setup()
 
         if(obj.containsKey("invert_relay") && obj["invert_relay"].is<bool>())
             invert_relay = obj["invert_relay"].as<bool>();
-        if(obj.containsKey("invert_led") && obj["invert_led"].is<bool>())
+        if(obj.containsKey("led_active_low") && obj["led_active_low"].is<bool>())
             invert_led = obj["invert_led"].as<bool>();
         if(obj.containsKey("start_on") && obj["start_on"].is<bool>())
             start_on = obj["start_on"].as<bool>();

@@ -88,7 +88,7 @@ Sonoff relay device
             "type": "switch",
             "relay_pin": 12,
             "led_pin": 13,
-            "invert_led": true,
+            "led_active_low": true,
             "button_pin": 0,
             "start_on": false,
             "button_pullup": false
@@ -151,7 +151,7 @@ Required ones are marked as such.
     * `invert_relay`: Boolean, If true the relay will be inverted which means the coil will be energized when the relay should turn off instead when it should turn on.
       This is useful if the relay is switched via a transistor or a pull up/down resistor.
     * `led_pin`: Number, IO pin a local status LED is connected to.
-    * `invert_led`: Boolean, If true the LED will be turned on when the relay is off instead of when it is on.
+    * `led_active_low`: Boolean, If true the LED will be turned on when pin is low.
       Useful for LEDs with switching transistors or pull up resistors.
     * `button_pin`: Number, IO pin a momentary switch for local control is connected to.
     * `button_pullup`: Boolean, If true the on chip pull-up resistor is enabled for the pin.
