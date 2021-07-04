@@ -8,7 +8,7 @@ Home Control has 3 Components
 - the Firmware (this repository)
 
 The Home Control Firmware is a multi-purpose firmware for ESP8266-based IOT devices.
-The firmware supports sensors (DHT22, DS18B20, BMP180, Capacitive Soil Moisture Sensor v1.2) and all kinds of binary GPIO actors such as relays boards.
+The firmware supports sensors (DHT22, DS18B20, BMP180, Capacitive Soil Moisture Sensor via MCP3208 ADC) and all kinds of binary GPIO actors such as relays boards.
 It runs on custom boards based on NodeMCUv2 (ESP12-E, ESP12-F) as well as on commercial IOT devices namely Sonoff Basic and Sonoff S20 (probably, other products will work, too, but have not been tested so far).
 Although, it would be possible to connect sensors to Sonoff devices, but for safety reasons it is not recommended and disabled.
 
@@ -22,7 +22,7 @@ To compile the firmware you need:
 1. Unpack the downloaded release file (or clone this repository) somewhere on your computer.
 1. Create a config file in the `src/` directory.
    We provide a `config.h.example` to help you getting started.
-   See [the build configuration section](#Build Configuration) for more information.
+   See [the build configuration section](#Build-Configuration) for more information.
 1. Build the firmware by running `pio run` in a terminal in the project root.
    If you want to save some time and/or disk space and only build the firmware for a specific supported board (see `platformio.ini` for supported boards, sections starting with `env:`) you can do so by running `pio run --board=<name>` instead.
 1. [Upload](#upload) the firmware to your device(s).   
@@ -78,6 +78,8 @@ The ids will be allocated in the order of the components in the configuration st
 In the Web Frontend, this `vnode_id` is needed to configure a device for the Home Control IOT System.
 
 #### Examples
+All mentioned pins correspond to the Arduino pin naming scheme.  
+
 Sonoff relay device
 ```json
 {
@@ -125,16 +127,16 @@ Required ones are marked as such.
 - `dht22`:
   A combined temperature/humidity sensor
     * `pin`: Number, *Required*, IO pin the sensor is connected to.
-    * `rate`: Number, How often the sensor should be polled (in seconds).
+    * `rate`: Number, Delay between to sensor(s) polls (in seconds).
     * `always_notify`: Boolean, If enabled always send the current value, otherwise it will only be sent if it changed.
 - `ds1820`:
-  A OneWire temperature sensor. Multiple sensors can be daisy-chained on a single pin.
+  A OneWire temperature sensor. Multiple sensors can be daisy-chained on a single pin. They will automatically get assigned vnode ids, as mentioned above.
     * `pin`: Number, *Required*, IO pin the sensor(s) are connected to.
-    * `rate`: Number, How often the sensor(s) should be polled (in seconds).
+    * `rate`: Number, Delay between two sensor(s) polls (in seconds).
     * `always_notify`: Boolean, If enabled always send the current value, otherwise it will only be sent if it changed.
 - `bmp180`:
   An air pressure and temperature sensor. Connected via SPI.
-    * `rate`: Number, How often the sensor should be polled (in seconds).
+    * `rate`: Number, Delay between two sensor(s) polls (in seconds).
     * `always_notify`: Boolean, If enabled always send the current value, otherwise it will only be sent if it changed.
     * `altitude`: Number, Device altitude above sea level in meters.
       Used to calculate sea-level equivalent air pressure.
@@ -142,7 +144,7 @@ Required ones are marked as such.
 - `mcp3208`:
   An MCP3208 ADC connected via SPI. Used for Capacitive Soil Moisture Sensors.
     * `cs_pin`: Number, *Required*, IO pin the sensor chip select pin is connected to.
-    * `rate`: Number, How often the sensor(s) should be polled (in seconds).
+    * `rate`: Number, Delay between two sensor(s) polls (in seconds).
     * `always_notify`: Boolean, If enabled always send the current value, otherwise it will only be sent if it changed.
 - `switch`:
   A relay with optional local control switch and/or button and status LED.
