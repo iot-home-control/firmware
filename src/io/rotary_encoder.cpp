@@ -17,17 +17,18 @@ void rotary_encoder::begin(unsigned char pin1, unsigned char pin2, unsigned char
     pinMode(pin1, INPUT_PULLUP);
     pinMode(pin2, INPUT_PULLUP);
 
-    isr_tramp_index1 = allocate_trampoline([=]
+    /*isr_tramp_index1 = allocate_trampoline([=]
     {
         encoder->tick();
     });
     isr_tramp_index2 = allocate_trampoline([=]
     {
         encoder->tick();
-    });
+    });*/
 
-    attachInterrupt(digitalPinToInterrupt(pin1),tramps[isr_tramp_index1], CHANGE);
-    attachInterrupt(digitalPinToInterrupt(pin2),tramps[isr_tramp_index2], CHANGE);
+    auto isr = [=]{ encoder->tick(); };
+    attachInterrupt(digitalPinToInterrupt(pin1), isr, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(pin2), isr, CHANGE);
 }
 
 int rotary_encoder::get_position()

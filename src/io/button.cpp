@@ -115,8 +115,8 @@ void button::begin(unsigned char pin, gpio_pin::pin_dir dir)
     this->pin=pin;
     last_button_state=_pin.read();
 
-    isr_index=allocate_trampoline(std::bind(&button::isr, this));
-    attachInterrupt(digitalPinToInterrupt(pin), tramps[isr_index], CHANGE);
+    //isr_index=allocate_trampoline(std::bind(&button::isr, this));
+    attachInterrupt(digitalPinToInterrupt(pin), [this](){isr();}, CHANGE);
     begin_called = true;
 }
 

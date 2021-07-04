@@ -1,8 +1,9 @@
 #pragma once
+
 #include "util.h"
 #include <functional>
 #include <Arduino.h>
-
+/*
 // See http://stackoverflow.com/a/32223343
 namespace foo
 {
@@ -40,7 +41,7 @@ namespace foo
 extern std::function<void()> isr_trampolines[NUM_ISR_TRAMPS];
 
 template<int N>
-void isr_tramp()
+void IRAM_ATTR isr_tramp()
 {
     static_assert(N<ARRAY_COUNT(isr_trampolines),"Too many trampolines");
     isr_trampolines[N]();
@@ -58,3 +59,5 @@ ISR*const * get_trampolines(foo::index_sequence<N...>)
 extern ISR*const * tramps;
 
 int allocate_trampoline(const std::function<void()> func);
+*/
+void attachInterrupt(uint8_t pin, std::function<void(void)> intRoutine, int mode);

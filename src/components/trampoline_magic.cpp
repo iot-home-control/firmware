@@ -1,5 +1,5 @@
 #include "trampoline_magic.h"
-
+/*
 ISR*const * tramps=get_trampolines(foo::make_index_sequence<NUM_ISR_TRAMPS>{});
 
 std::function<void()> isr_trampolines[NUM_ISR_TRAMPS];
@@ -16,3 +16,4 @@ int allocate_trampoline(const std::function<void()> func)
     }
     return -1;
 }
+*/
