@@ -156,7 +156,7 @@ Required ones are marked as such.
     * `led_active_low`: Boolean, If true the LED will be turned on when pin is low.
       Useful for LEDs with switching transistors or pull up resistors.
     * `button_pin`: Number, IO pin a momentary switch for local control is connected to.
-    * `button_pullup`: Boolean, If true the on chip pull-up resistor is enabled for the pin.
+    * `button_pullup`: Boolean, If true the on-chip pull-up resistor is enabled for the pin.
     * `toggle_pin`: Number, IO pin a toggle switch for local control is connected to.
       It behaves like a normal multiway light switch.
-    * `toggle_pullup`: Boolean, If true the on chip pull-up resistor is enabled for the pin.
+    * `toggle_pullup`: Boolean, If true the on-chip pull-up resistor is enabled for the pin.
