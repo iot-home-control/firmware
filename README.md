@@ -160,3 +160,14 @@ Required ones are marked as such.
     * `toggle_pin`: Number, IO pin a toggle switch for local control is connected to.
       It behaves like a normal multiway light switch.
     * `toggle_pullup`: Boolean, If true the on-chip pull-up resistor is enabled for the pin.
+
+## Licensing
+While the Home Control firmware itself is licensed under the [GNU GPL 3](LICENSE) it also uses the following 3rd party libraries which have different licenses:
+- PubSubClient: MIT License, Copyright (c) 2008-2020 Nicholas O'Leary
+- ArduinoJson: MIT License, Copyright (c) 2014-2021 Benoit BLANCHON
+- RotaryEncoder: BSD License, Copyright (c) 2005-2014 by Matthias Hertel,  http://www.mathertel.de/
+- Adafruit BME280 Library: BSD License, Copyright (c) 2015, Limor Fried & Kevin Townsend for Adafruit Industries
+- DHT sensor library: MIT License, Copyright (c) 2020 Adafruit Industries
+- Sparkfun BMP180: Sparkfun / Toni Klopfenstein, Beerware License
+- Mcp320x: MIT License, Copyright (c) 2017 labfruits
+- DallasTemperature: LGPL v2.1 or later, Miles Burton, Tim Newsome, Guil Barros, and Rob Tillaart
