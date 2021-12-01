@@ -28,6 +28,7 @@
 #endif
 #include "io/relay.h"
 #include "io/gpio_pin.h"
+#include "io/pwm_pin.h"
 #include "components/config_loader.h"
 #include <ArduinoJson.h>
 
@@ -176,7 +177,7 @@ void node::setup()
             mqtt.publish(get_state_topic("soilmoisture", channel),"local,"+String(soil_moisture));
             Serial.printf("Channel %d: raw %d analog %d\n", channel, raw, analog);
         };
-        mcp->begin(cs_pin, adc_vref, 3, refresh_rate*1000, always_notify);
+        mcp->begin(cs_pin, adc_vref, 8, refresh_rate*1000, always_notify);
 
         return mcp;
     });
@@ -227,6 +228,34 @@ void node::setup()
         r->begin(this, vnode_id, relay_pin, led_pin, button_pin, button_pullup, toggle_pin, toggle_pullup, start_on, invert_relay, invert_led);
 
         return r;
+    });
+
+    loader.install_factory("pwm_out", 0, [this](const JsonObject &obj, int vnode_id) -> ticker_component*
+    {
+        uint8_t pin = 0;
+        uint8_t resolution = 10;
+        uint32_t frequency = 1000;
+        if(!obj.containsKey("pin") || !obj["pin"].is<int>())
+        {
+            Serial.println("Can't create pwm_out. pin is not set or not an int");
+            return nullptr;
+        }
+        else
+        {
+            pin = obj["pin"].as<int>();
+        }
+        if(obj.containsKey("resolution") && obj["resolution"].is<int>())
+            resolution = obj["resolution"].as<int>();
+        if(obj.containsKey("frequency") && obj["frequency"].is<int>())
+            frequency = obj["frequency"].as<int>();
+
+        pwm_pin *ppin = new pwm_pin("pwm");
+        ppin->begin(this, vnode_id, pin, resolution, frequency);
+
+        if(obj.containsKey("start_value") && obj["start_value"].is<int>())
+            ppin->write(obj["start_value"].as<int>());
+
+        return ppin;
     });
 
     loader.begin(components, digitalRead(0)==LOW);

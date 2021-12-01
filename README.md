@@ -160,6 +160,11 @@ Required ones are marked as such.
     * `toggle_pin`: Number, IO pin a toggle switch for local control is connected to.
       It behaves like a normal multiway light switch.
     * `toggle_pullup`: Boolean, If true the on-chip pull-up resistor is enabled for the pin.
+- `pwm_out`:  A PWM output pin.
+    * `pin`: Number, *Required*, IO pin to use for PWM output.
+    * `resolution`: Number, Resolution of the PWM value. 4 to 16 bit, defaults to 10 bit output.
+    * `frequency`: Number, PWM base frequency. 100Hz up to 40000Hz, defaults to 1000Hz. Be aware that higher frequencies use more CPU cycles since the ESP8266 has no hardware PWM controller. 
+    * `start_value`: Number, Initial output value after system power on, defaults to 0.
 
 ## Licensing
 While the Home Control firmware itself is licensed under the [GNU GPL 3](LICENSE) it also uses the following 3rd party libraries which have different licenses:
