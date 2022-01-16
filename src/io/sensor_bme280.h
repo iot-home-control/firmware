@@ -28,7 +28,7 @@ private:
     Adafruit_BME280 *sensor;
     unsigned long prev_millis, update_every_ms;
 
-    float last_temperature, last_abs_pressure;
+    float last_temperature, last_abs_pressure, last_humidity;
     float altitude;
     bool always_notify;
 public:
@@ -39,9 +39,11 @@ public:
     void begin(unsigned long update_every_ms, const bool always_notify=false, const float altitude=NAN);
     void update() override;
     float get_temperature();
+    float get_humidity();
     float get_absolute_pressure();
     float get_relative_pressure();
 
     callback on_temperature_changed;
+    callback on_humidity_changed;
     callback2 on_pressure_changed;
 };

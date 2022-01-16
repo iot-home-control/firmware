@@ -30,6 +30,7 @@ void sensor_bme280::begin(unsigned long update_every_ms, const bool always_notif
     if(!sensor)
         sensor = new Adafruit_BME280();
     sensor->begin();
+    sensor->setSampling(Adafruit_BME280::MODE_FORCED, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1);
 }
 
 void sensor_bme280::update()
@@ -41,14 +42,23 @@ void sensor_bme280::update()
         if(!sensor)
             return;
 
+        if (!sensor->takeForcedMeasurement()) return;
         double temperature = sensor->readTemperature();
-        double abs_pressure = sensor->readPressure();
+        double humidity = sensor->readHumidity();
+        double abs_pressure = sensor->readPressure()/100;
 
         if(temperature != last_temperature || always_notify)
         {
             last_temperature = temperature;
             if(on_temperature_changed)
                 on_temperature_changed(temperature);
+        }
+
+        if(humidity != last_humidity || always_notify)
+        {
+            last_humidity = humidity;
+            if(on_humidity_changed)
+                on_humidity_changed(humidity);
         }
 
         if(abs_pressure != last_abs_pressure || always_notify)
@@ -65,6 +75,11 @@ float sensor_bme280::get_temperature()
     return last_temperature;
 }
 
+float sensor_bme280::get_humidity()
+{
+    return last_humidity;
+}
+
 float sensor_bme280::get_absolute_pressure()
 {
     return last_abs_pressure;
@@ -74,5 +89,5 @@ float sensor_bme280::get_relative_pressure()
 {
     if(isnan(altitude))
         return 0.0f;
-    return sensor->seaLevelForAltitude(last_abs_pressure, altitude);
+    return sensor->seaLevelForAltitude(altitude, last_abs_pressure);
 }

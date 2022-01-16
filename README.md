@@ -141,6 +141,12 @@ Required ones are marked as such.
     * `altitude`: Number, Device altitude above sea level in meters.
       Used to calculate sea-level equivalent air pressure.
       Without this the device will only report the temperature.
+- `bme280`:
+  An air pressure, temperature and humidity sensor. Connected via I2C.
+    * `rate`: Number, Delay between two sensor(s) polls (in seconds).
+    * `always_notify`: Boolean, If enabled always send the current value, otherwise it will only be sent if it changed.
+    * `altitude`: Number, Device altitude above sea level in meters.
+      Used to calculate sea-level equivalent air pressure.
 - `mcp3208`:
   An MCP3208 ADC connected via SPI. Used for Capacitive Soil Moisture Sensors.
     * `cs_pin`: Number, *Required*, IO pin the sensor chip select pin is connected to.
