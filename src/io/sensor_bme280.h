@@ -31,6 +31,7 @@ private:
     float last_temperature, last_abs_pressure, last_humidity;
     float altitude;
     bool always_notify;
+    int retries = 0;
 public:
     typedef std::function<void(const float)> callback;
     typedef std::function<void(const float, const float)> callback2; // absolute, sea-level relative pressure

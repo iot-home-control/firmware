@@ -42,10 +42,25 @@ void sensor_bme280::update()
         if(!sensor)
             return;
 
+        if(retries == 3)
+        {
+            retries = 0;
+            return;
+        }
+
         if (!sensor->takeForcedMeasurement()) return;
         double temperature = sensor->readTemperature();
         double humidity = sensor->readHumidity();
         double abs_pressure = sensor->readPressure()/100;
+
+        if(std::isnan(temperature) || std::isnan(humidity) || std::isnan(abs_pressure))
+        {
+            prev_millis = curr_millis - update_every_ms + 2000;
+            retries++;
+            return;
+        }
+
+        retries = 0;
 
         if(temperature != last_temperature || always_notify)
         {
