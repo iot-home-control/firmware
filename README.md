@@ -20,17 +20,17 @@ To compile the firmware you need:
 
 ### Setup
 1. Unpack the downloaded release file (or clone this repository) somewhere on your computer.
-1. Create a config file in the `src/` directory.
+1. Create a config file `config.h` in the `src/` directory.
    We provide a `config.h.example` to help you getting started.
    See [the build configuration section](#Build-Configuration) for more information.
 1. Build the firmware by running `pio run` in a terminal in the project root.
-   If you want to save some time and/or disk space and only build the firmware for a specific supported board (see `platformio.ini` for supported boards, sections starting with `env:`) you can do so by running `pio run --board=<name>` instead.
+   If you want to save some time and/or disk space and only build the firmware for a specific supported board (see `platformio.ini` for supported boards, sections starting with `env:`) you can do so by running `pio run --env=<name>` instead.
 1. [Upload](#upload) the firmware to your device(s).   
 ### Build Configuration
 The Firmware is configured via a C header file. The following options are supported:
 - `WIFI_SSID`, `WIFI_PASS`: SSID and password of your WiFi network.
   In case your WiFi network doesn't use a password just leave the password entry blank (an empty string).
-- `OTA_PASS`: The password used for over-the-air firmware updates.
+- `OTA_PASS`: The password used for over-the-air firmware updates. Leaving this empty will lead to passwordless authentication for firmware updates. We strongly recommend to set this.
 - `MQTT_HOST`, `MQTT_USER`, `MQTT_PASS`: MQTT connection details.
   The `MQTT_HOST` can be either an IP address, or a hostname which can be resolved via DNS.
   In case your MQTT broker doesn't use authentication you can leave `MQTT_USER` and/or `MQTT_PASS` blank (an empty string).
