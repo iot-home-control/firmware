@@ -45,7 +45,7 @@ Platformio has the ability to upload either via serial console or OTA.
 However, we provide a bash script `upload.sh`, which is more convenient, than using platformio.
 
 Usage:  
-`./upload.sh <BOARD> serial [PORT [BAUD]]`
+`./upload.sh <BOARD> serial [PORT [BAUD]]`  
 `./upload.sh <BOARD> ota <NAME> [PASS] [-p PORT]`
 
 Board can be:
