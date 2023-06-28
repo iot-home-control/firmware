@@ -74,7 +74,7 @@ To configure your device, put a file named `esp8266-<DEVICE-ID>.json` in a folde
 The configuration must contain the followings keys
 - `name` a human-readable identifier
 - `version` an integer, which is used to check whether the config has changed
-- `components` a list of components (see examples below or [detailed documentation](####Components))
+- `components` a list of components (see examples below or [detailed documentation](#Components))
 
 Any device can have multiple components of the same type or of distinct types.
 For any component of the same type, a virtual node id (`vnode_id`) is incremented.
