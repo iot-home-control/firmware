@@ -37,6 +37,7 @@ The Firmware is configured via a C header file. The following options are suppor
 - `CONFIG_SERVER`: The host where your system-backend instance is running.
   It can be either an IP address, or a hostname which can be resolved via DNS.
   This is used to check for new configuration files.
+  You don't strictly need to use the system-backend sofware but any server which will serve JSON data, as described below in the [Runtime Configuration](#Runtime Configuration) section, when requested via HTTP GET request to `/api/v1/config?device=<DEVICE-ID>`, where `<DEVICE_ID>` is the id of the module.
 
 ### Upload
 Platformio has the ability to upload either via serial console or OTA.
