@@ -26,6 +26,7 @@ To compile the firmware you need:
 1. Build the firmware by running `pio run` in a terminal in the project root.
    If you want to save some time and/or disk space and only build the firmware for a specific supported board (see `platformio.ini` for supported boards, sections starting with `env:`) you can do so by running `pio run --env=<name>` instead.
 1. [Upload](#upload) the firmware to your device(s).   
+
 ### Build Configuration
 The Firmware is configured via a C header file. The following options are supported:
 - `WIFI_SSID`, `WIFI_PASS`: SSID and password of your WiFi network.
@@ -44,15 +45,17 @@ Platformio has the ability to upload either via serial console or OTA.
 However, we provide a bash script `upload.sh`, which is more convenient, than using platformio.
 
 Usage:  
-`./upload.sh <BOARD> serial [PORT] [BAUD]`  
+`./upload.sh <BOARD> serial [PORT [BAUD]]`
 `./upload.sh <BOARD> ota <NAME> [PASS] [-p PORT]`
 
-Board can be 
+Board can be:
 - nodemcuv2
 - sonoff_basic
 - sonoff_s20
 
-Name can be
+For updates over serial `<PORT>` is the name of a COM port on Windows (e.g. COM3) or unix device path, it defaults to `/dev/ttyUSB0`. `<BAUD>` is the baudrate you wish to flash with, it defaults to 115200.
+
+For OTA updates `<NAME>` can be:
 - an IP address 
 - a DNS name, which is `esp8266-<DEVICE-ID>`
 - an alias configured in `upload_aliases.json`
