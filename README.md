@@ -78,6 +78,13 @@ For any component of the same type, a virtual node id (`vnode_id`) is incremente
 The ids will be allocated in the order of the components in the configuration starting at 0.
 In the Web Frontend, this `vnode_id` is needed to configure a device for the Home Control IOT System.
 
+#### How to find you device ID
+Every ESP8266 based device has it's own, unique device id which is derived from it's MAC address.
+The firmware prints it's own device ID to the serial console when booting.
+You can see the serial output by using a terminal program of your choice at 115200 baud.
+If you have `picocom` installed you can use the provided `console.sh` script included with the firmware (it will connect to `/dev/ttyUSB0`.
+
+
 #### Examples
 All mentioned pins correspond to the Arduino pin naming scheme.  
 
