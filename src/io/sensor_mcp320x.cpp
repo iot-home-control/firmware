@@ -45,7 +45,7 @@ void sensor_mcp320x<n>::update()
 
         for(int i = 0; i<active_channels; i++)
         {
-            int channel = i;
+            uint8 channel = i;
             if(map::mode_shift)
             {
                 channel |= (1<<map::mode_shift);

@@ -214,14 +214,14 @@ void node::setup()
         gpio_pin *cs_gpio = new gpio_pin();
         cs_gpio->begin(cs_pin, gpio_pin::pin_out);
 
-        const uint16_t adc_vref = 3300; // 3.3V Vref;
+        const uint16_t adc_vref = 5000; // 3.3V Vref;
         sensor_mcp320x<8> *mcp = new sensor_mcp320x<8>();
         mcp->on_value_changed = [this] (char channel, uint16_t raw, uint16_t analog) {
-            float soil_moisture = (1 - (float)analog / 4096) * 100;
+            float soil_moisture = (1 - ((float)analog / adc_vref)) * 100;
             mqtt.publish(get_state_topic("soilmoisture", channel),"local,"+String(soil_moisture));
             Serial.printf("Channel %d: raw %d analog %d\n", channel, raw, analog);
         };
-        mcp->begin(cs_pin, adc_vref, 8, refresh_rate*1000, always_notify);
+        mcp->begin(cs_pin, adc_vref, 6, refresh_rate*1000, always_notify);
 
         return mcp;
     });
