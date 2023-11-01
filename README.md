@@ -147,6 +147,7 @@ Required ones are marked as such.
     * `always_notify`: Boolean, If enabled always send the current value, otherwise it will only be sent if it changed.
     * `altitude`: Number, Device altitude above sea level in meters.
       Used to calculate sea-level equivalent air pressure.
+    * `use_alt_address`: Boolean, If true use the alternate BME280 I2C address. Some modules are configured to use it by default. Also allows using two sensors on the same bus.
 - `mcp3208`:
   An MCP3208 ADC connected via SPI. Used for Capacitive Soil Moisture Sensors.
     * `cs_pin`: Number, *Required*, IO pin the sensor chip select pin is connected to.

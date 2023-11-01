@@ -37,7 +37,7 @@ public:
     typedef std::function<void(const float, const float)> callback2; // absolute, sea-level relative pressure
 
     sensor_bme280();
-    void begin(unsigned long update_every_ms, const bool always_notify=false, const float altitude=NAN);
+    void begin(unsigned long update_every_ms, const bool always_notify=false, const float altitude=NAN, const bool use_alt_address);
     void update() override;
     float get_temperature();
     float get_humidity();

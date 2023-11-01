@@ -22,14 +22,14 @@ sensor_bme280::sensor_bme280(): sensor(nullptr), prev_millis(0), last_temperatur
 {
 }
 
-void sensor_bme280::begin(unsigned long update_every_ms, const bool always_notify, const float altitude)
+void sensor_bme280::begin(unsigned long update_every_ms, const bool always_notify, const float altitude, const bool use_alt_address)
 {
     this->update_every_ms = update_every_ms;
     this->always_notify = always_notify;
     this->altitude = altitude;
     if(!sensor)
         sensor = new Adafruit_BME280();
-    sensor->begin();
+    sensor->begin(use_alt_address ? BME280_ADDRESS_ALTERNATE : BME280_ADDRESS);
     sensor->setSampling(Adafruit_BME280::MODE_FORCED, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1);
 }
 

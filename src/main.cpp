@@ -159,9 +159,12 @@ void node::setup()
         float altitude = NAN;
         if(obj.containsKey("altitude") && obj["altitude"].is<double>())
             altitude = obj["altitude"].as<double>();
+        bool use_alt_address = false;
+        if(obj.containsKey("use_alt_address") && obj["use_alt_address"].is<bool>())
+            use_alt_address = obj["use_alt_address"].as<bool>();
 
         sensor_bme280 *sensor = new sensor_bme280();
-        sensor->begin(refresh_rate*1000, always_notify, altitude);
+        sensor->begin(refresh_rate*1000, always_notify, altitude, use_alt_address);
         sensor->on_temperature_changed = [this, vnode_id](const float value)
         {
             Serial.printf("BME280 #%d Temperature changed: ", vnode_id);
