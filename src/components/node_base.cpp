@@ -17,6 +17,7 @@
 */
 
 #include "node_base.h"
+#include "buildinfo.h"
 
 node_base::node_base(bool serial_alternate_rx_tx): serial_alternate_pins(serial_alternate_rx_tx)
 {
@@ -47,9 +48,9 @@ void node_base::setup() {
     Serial.println();
 
     Serial.print("Built on ");
-    Serial.print(__DATE__);
-    Serial.print(", ");
-    Serial.println(__TIME__);
+    Serial.print(build_date);
+    Serial.print(" from git version ");
+    Serial.println(git_version);
 
     Serial.print("Device-Id: ");
     Serial.println(device_id);
