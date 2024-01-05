@@ -20,38 +20,42 @@ To compile the firmware you need:
 
 ### Setup
 1. Unpack the downloaded release file (or clone this repository) somewhere on your computer.
-1. Create a config file in the `src/` directory.
+1. Create a config file `config.h` in the `src/` directory.
    We provide a `config.h.example` to help you getting started.
    See [the build configuration section](#Build-Configuration) for more information.
 1. Build the firmware by running `pio run` in a terminal in the project root.
-   If you want to save some time and/or disk space and only build the firmware for a specific supported board (see `platformio.ini` for supported boards, sections starting with `env:`) you can do so by running `pio run --board=<name>` instead.
+   If you want to save some time and/or disk space and only build the firmware for a specific supported board (see `platformio.ini` for supported boards, sections starting with `env:`) you can do so by running `pio run --env=<name>` instead.
 1. [Upload](#upload) the firmware to your device(s).   
+
 ### Build Configuration
 The Firmware is configured via a C header file. The following options are supported:
 - `WIFI_SSID`, `WIFI_PASS`: SSID and password of your WiFi network.
   In case your WiFi network doesn't use a password just leave the password entry blank (an empty string).
-- `OTA_PASS`: The password used for over-the-air firmware updates.
+- `OTA_PASS`: The password used for over-the-air firmware updates. Leaving this empty will lead to passwordless authentication for firmware updates. We strongly recommend to set this.
 - `MQTT_HOST`, `MQTT_USER`, `MQTT_PASS`: MQTT connection details.
   The `MQTT_HOST` can be either an IP address, or a hostname which can be resolved via DNS.
   In case your MQTT broker doesn't use authentication you can leave `MQTT_USER` and/or `MQTT_PASS` blank (an empty string).
 - `CONFIG_SERVER`: The host where your system-backend instance is running.
   It can be either an IP address, or a hostname which can be resolved via DNS.
   This is used to check for new configuration files.
+  You don't strictly need to use the system-backend sofware but any server which will serve JSON data, as described below in the [Runtime Configuration](#Runtime Configuration) section, when requested via HTTP GET request to `/api/v1/config?device=<DEVICE-ID>`, where `<DEVICE_ID>` is the id of the module.
 
 ### Upload
 Platformio has the ability to upload either via serial console or OTA.
 However, we provide a bash script `upload.sh`, which is more convenient, than using platformio.
 
 Usage:  
-`./upload.sh <BOARD> serial [PORT] [BAUD]`  
+`./upload.sh <BOARD> serial [PORT [BAUD]]`  
 `./upload.sh <BOARD> ota <NAME> [PASS] [-p PORT]`
 
-Board can be 
+Board can be:
 - nodemcuv2
 - sonoff_basic
 - sonoff_s20
 
-Name can be
+For updates over serial `<PORT>` is the name of a COM port on Windows (e.g. COM3) or unix device path, it defaults to `/dev/ttyUSB0`. `<BAUD>` is the baudrate you wish to flash with, it defaults to 115200.
+
+For OTA updates `<NAME>` can be:
 - an IP address 
 - a DNS name, which is `esp8266-<DEVICE-ID>`
 - an alias configured in `upload_aliases.json`
@@ -70,12 +74,19 @@ To configure your device, put a file named `esp8266-<DEVICE-ID>.json` in a folde
 The configuration must contain the followings keys
 - `name` a human-readable identifier
 - `version` an integer, which is used to check whether the config has changed
-- `components` a list of components (see examples below or [detailed documentation](####Components))
+- `components` a list of components (see examples below or [detailed documentation](#Components))
 
 Any device can have multiple components of the same type or of distinct types.
 For any component of the same type, a virtual node id (`vnode_id`) is incremented.
 The ids will be allocated in the order of the components in the configuration starting at 0.
 In the Web Frontend, this `vnode_id` is needed to configure a device for the Home Control IOT System.
+
+#### How to find you device ID
+Every ESP8266 based device has its own, unique device id which is derived from the modueles MAC address.
+The firmware prints it's own device ID to the serial console when booting.
+You can see the serial output by using a terminal program of your choice at 115200 baud.
+If you have `picocom` installed you can use the provided `console.sh` script included with the firmware (it will connect to `/dev/ttyUSB0`.
+
 
 #### Examples
 All mentioned pins correspond to the Arduino pin naming scheme.  
