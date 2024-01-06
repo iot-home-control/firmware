@@ -16,7 +16,7 @@ if git_dir.exists():
         with open(git_dir / refname, "r") as f:
             git_version = f.read().strip()[:7] + "?"
     else:
-        git_version = subprocess.check_output(["git", "describe", "--always", "--dirty=*"]).strip()
+        git_version = subprocess.check_output(["git", "describe", "--always", "--dirty=*"]).strip().decode()
 else:
     git_version = "unknown"
 
