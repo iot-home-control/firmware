@@ -17,7 +17,9 @@
 */
 
 #include "node_base.h"
-#include "buildinfo.h"
+
+extern const char *build_date;
+extern const char *git_version;
 
 node_base::node_base(bool serial_alternate_rx_tx): serial_alternate_pins(serial_alternate_rx_tx)
 {

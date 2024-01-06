@@ -16,12 +16,10 @@ else:
     git_version = "unknown"
 
 lines = [
-    '#pragma once',
-    '',
     f'const char *build_date = "{datetime.datetime.now(tz=datetime.timezone.utc).strftime("%Y-%m-%dT%H:%MZ")}";',
     f'const char *git_version = "{git_version}";',
     '',
 ]
 
-with open("src/buildinfo.h", "w") as f:
+with open("src/buildinfo.c", "w") as f:
     f.write("\n".join(lines))
