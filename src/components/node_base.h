@@ -47,6 +47,8 @@ public:
     String get_state_topic(const String& type, const int vnode=0);
     String get_action_topic(const String& type, const int vnode=0, const String& alt_suffix="");
 
+    virtual String get_device_info_string();
+
     mqtt_handler mqtt;
 protected:
     String device_id;

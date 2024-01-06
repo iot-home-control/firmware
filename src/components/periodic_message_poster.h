@@ -37,6 +37,7 @@ public:
     void update();
     void begin(mqtt_handler* mqtt, const String& topic, const String& message, unsigned long interval);
     void post_now();
+    void set_message(const String &message_) { message = message_; }
 };
 
 #endif

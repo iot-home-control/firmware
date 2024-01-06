@@ -17,6 +17,7 @@
 */
 
 #include "node_base.h"
+#include <ArduinoJson.h>
 
 extern const char *build_date;
 extern const char *git_version;
@@ -66,7 +67,7 @@ void node_base::setup() {
     mqtt.on_connected=std::bind(&node_base::on_mqtt_connected, this);
     mqtt.on_disconnected=std::bind(&node_base::on_mqtt_disconnected, this);
 
-    message_poster.begin(&mqtt, "alive", device_id, 60000);
+    message_poster.begin(&mqtt, "alive", get_device_info_string(), 60000);
     components.push_back(&message_poster);
 
     webserver.begin(80);
@@ -75,6 +76,19 @@ void node_base::setup() {
         delay(100);
         ESP.reset();
     });
+}
+
+String node_base::get_device_info_string() {
+    StaticJsonDocument<256> doc;
+    doc["device_id"] = device_id;
+    doc["local_ip"] = WiFi.status()==WL_CONNECTED ? WiFi.localIP().toString() : String();
+    doc["build_date"] = build_date;
+    doc["git_version"] = git_version;
+    doc["update_available"] = nullptr;
+
+    String res;
+    serializeJson(doc, res);
+    return res;
 }
 
 void node_base::loop() {
@@ -146,6 +160,7 @@ void node_base::on_wifi_disconnected()
 void node_base::on_mqtt_connected()
 {
     Serial.println("MQTT Connected");
+    message_poster.set_message(get_device_info_string());
     message_poster.post_now();
 }
 
