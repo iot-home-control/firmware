@@ -49,8 +49,8 @@ private:
     bool first_click_detected=false;
     bool button_down=false;
     bool last_button_state=false;
-    bool rise_detected = false;
-    bool fall_detected = false;
+    bool previous_signal_level=false;
+    bool signal_level=false;
 
     const unsigned long timeout_double_click=500;
     const unsigned long click_minimum=25;

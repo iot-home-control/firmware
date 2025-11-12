@@ -59,7 +59,6 @@ void button::isr()
             // Short Click
             if(hold_time>=click_minimum && hold_time<=medium_click)
             {
-                fall_detected = true;
                 if(cb_double_short)
                 {
                     // Remember first click
@@ -120,8 +119,13 @@ void button::isr()
         }
         last_button_state=button;
     }
-    if (button_down && hold_start >= click_minimum)
-        rise_detected = true;
+    else
+    {
+        // Button state unchanged
+
+    }
+    previous_signal_level = signal_level;
+    signal_level = button_down && hold_start >= click_minimum;
 
     in_isr=false;
 }
@@ -156,13 +160,14 @@ void button::update()
     else if(trigger==event_trigger::double_short && cb_double_short)
         cb_double_short();
 
-    if(rise_detected && cb_level_risen)
-        cb_level_risen();
-    if(fall_detected && cb_level_fallen)
-        cb_level_fallen();
+    if(previous_signal_level != signal_level)
+    {
+        if(signal_level && cb_level_risen)
+            cb_level_risen();
+        if(!signal_level && cb_level_fallen)
+            cb_level_fallen();
+    }
 
-    rise_detected = false;
-    fall_detected = false;
     trigger=event_trigger::none;
 }
 
