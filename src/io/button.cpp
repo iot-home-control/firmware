@@ -119,12 +119,7 @@ void button::isr()
         }
         last_button_state=button;
     }
-    else
-    {
-        // Button state unchanged
 
-    }
-    previous_signal_level = signal_level;
     signal_level = button_down && hold_start >= click_minimum;
 
     in_isr=false;
@@ -166,6 +161,7 @@ void button::update()
             cb_level_risen();
         if(!signal_level && cb_level_fallen)
             cb_level_fallen();
+        previous_signal_level = signal_level;
     }
 
     trigger=event_trigger::none;
