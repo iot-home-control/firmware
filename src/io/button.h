@@ -42,13 +42,15 @@ private:
     gpio_pin _pin;
     unsigned char pin;
     int isr_index=-1;
-    callback cb_short, cb_medium, cb_long, cb_double_short;
+    callback cb_short, cb_medium, cb_long, cb_double_short, cb_level_risen, cb_level_fallen;
 
     unsigned long hold_start=0;
     unsigned long last_click_stop=0;    
     bool first_click_detected=false;
     bool button_down=false;
     bool last_button_state=false;
+    bool rise_detected = false;
+    bool fall_detected = false;
 
     const unsigned long timeout_double_click=500;
     const unsigned long click_minimum=25;
@@ -67,6 +69,8 @@ public:
     void on_medium_click(callback cb);
     void on_long_click(callback cb);
     void on_double_short_click(callback cb);
+    void on_level_risen(callback cb);
+    void on_level_fallen(callback cb);
 };
 
 #endif // BUTTON_H
