@@ -241,6 +241,7 @@ void node::setup()
         bool button_pullup = true;
         char toggle_pin = -1;
         bool toggle_pullup = true;
+        bool use_button_level_trigger = false;
 
         if(!obj.containsKey("relay_pin") || !obj["relay_pin"].is<int>())
         {
@@ -270,9 +271,11 @@ void node::setup()
             toggle_pin = obj["toggle_pin"].as<int>();
         if(obj.containsKey("toggle_pullup") && obj["toggle_pullup"].is<bool>())
             toggle_pullup = obj["toggle_pullup"].as<bool>();
+        if(obj.containsKey("use_button_level_trigger") && obj["use_button_level_trigger"].is<bool>())
+            use_button_level_trigger = obj["use_button_level_trigger"].as<bool>();
 
 
-        r->begin(this, vnode_id, relay_pin, led_pin, button_pin, button_pullup, toggle_pin, toggle_pullup, start_on, invert_relay, invert_led);
+        r->begin(this, vnode_id, relay_pin, led_pin, button_pin, button_pullup, use_button_level_trigger, toggle_pin, toggle_pullup, start_on, invert_relay, invert_led);
 
         return r;
     });

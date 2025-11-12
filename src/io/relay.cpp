@@ -24,7 +24,7 @@ relay::relay(const String type_name): type_name(type_name)
 {
 }
 
-void relay::begin(node_base *node, const int vnode_id, const char relay_pin, const char led_pin, const char button_pin, const bool button_pullup, const char toggle_pin, const bool toggle_pullup, const bool start_on, const bool invert_relay, const bool invert_led)
+void relay::begin(node_base *node, const int vnode_id, const char relay_pin, const char led_pin, const char button_pin, const bool button_pullup, const bool use_button_level_trigger, const char toggle_pin, const bool toggle_pullup, const bool start_on, const bool invert_relay, const bool invert_led)
 {
     this->node = node;
     this->start_on = start_on;
@@ -42,10 +42,24 @@ void relay::begin(node_base *node, const int vnode_id, const char relay_pin, con
     if(button_pin>=0)
     {
         button_.begin(button_pin, button_pullup ? gpio_pin::pin_in_pullup: gpio_pin::pin_in);
-        button_.on_short_click([this]
+        if(use_button_level_trigger)
         {
-            switch_state(!state, true);
-        });
+            button_.on_level_risen([this]
+            {
+                switch_state(true, true);
+            });
+            button_.on_level_fallen([this]
+            {
+                switch_state(false, true);
+            });
+        }
+        else
+        {
+            button_.on_short_click([this]
+            {
+                switch_state(!state, true);
+            });
+        }
     }
     if(toggle_pin>=0)
     {
